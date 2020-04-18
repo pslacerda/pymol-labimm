@@ -1,4 +1,5 @@
-import subprocess, sys
+import subprocess
+import sys
 
 
 def pip(args):
@@ -11,9 +12,15 @@ def pip(args):
     return process, out, err
 
 
-proc, out, err = pip(['install', 'git+https://github.com/pslacerda/pymol-labimm.git'])
+try:
+    from pymol_labimm import __init_plugin__
+except ImportError:
+    proc, out, err = pip(['install', 'pymol-labimm'])
+    if out:
+        print(out)
+    if err:
+        print(err)
+    from pymol_labimm import __init_plugin__
 
-if out:
-    print(out)
-if err:
-    print(err)
+
+__init_plugin__()
