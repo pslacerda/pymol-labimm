@@ -11,7 +11,7 @@ def pip(args):
     return process, out, err
 
 
-proc, out, err = pip(['install', 'git+https://github.com/pslacerda/labimm-pymol'])
+proc, out, err = pip(['install', 'git+https://github.com/pslacerda/pymol-labimm.git'])
 
 if out:
     print(out)
