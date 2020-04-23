@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import pathlib
+
 from setuptools import find_packages, setup
 
 HERE = pathlib.Path(__file__).parent
@@ -9,7 +10,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="pymol-labimm",
-    version="0.1.1",
+    version="0.2.0",
     description="Some PyMOL utilities",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -29,4 +30,3 @@ setup(
     packages=find_packages(),
     install_requires=["pandas", "scipy", "requests", "cached_property"],
 )
-

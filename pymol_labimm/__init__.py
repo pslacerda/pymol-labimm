@@ -1,14 +1,26 @@
-__version__ = "0.1.0"
+import subprocess
+import sys
 
 import pymol.gui
 
 from .ftmap.core import init_plugin_cli as ftmap_init_plugin_cli
 from .ftmap.gui import init_plugin_gui as ftmap_init_plugin_gui
-from .vina import init_plugin as vina_init_plugin
 from .prefs import guess_prefs
+from .vina import init_plugin as vina_init_plugin
 
 
-def __init_plugin__(app=None):
+def pip(args):
+    process = subprocess.Popen(
+        [sys.executable, "-m", "pip", "--disable-pip-version-check"] + args,
+        universal_newlines=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    out, err = process.communicate()
+    return process, out, err
+
+
+def init_plugin():
     guess_prefs()
 
     # FTMap
@@ -22,3 +34,13 @@ def __init_plugin__(app=None):
 
     # Vina
     vina_init_plugin(labimm_menu)
+
+    update_action = labimm_menu.addAction("Update...")
+
+    @update_action.triggered.connect
+    def triggered():
+        proc, out, err = pip(["install", "--upgrade", "pymol-labimm"])
+        if out:
+            print(out)
+        if err:
+            print(err)

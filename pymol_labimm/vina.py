@@ -100,6 +100,7 @@ QPalette = pymol.Qt.QtGui.QPalette
 QTextDocument = pymol.Qt.QtGui.QTextDocument
 QIntValidator = pymol.Qt.QtGui.QIntValidator
 QTextCursor = pymol.Qt.QtGui.QTextCursor
+QIcon = pymol.Qt.QtGui.QIcon
 
 
 ###############################################
@@ -888,18 +889,27 @@ def new_run_docking_widget():
     def validate(text):
         validate_target_sel()
 
+    target_action = None
+
     def validate_target_sel():
+        nonlocal target_action
         text = target_sel.text()
-        palette = QApplication.palette(target_sel)
-        palette.setColor(QPalette.Base, QtCore.Qt.white)
         valid = True
         try:
             if cmd.count_atoms(f"{text}") == 0:
                 raise
         except:
-            palette.setColor(QPalette.Base, QtCore.Qt.red)
             valid = False
-        target_sel.setPalette(palette)
+
+        if valid:
+            if target_action is not None:
+                target_sel.removeAction(target_action)
+        else:
+            if target_action is not None:
+                target_sel.removeAction(target_action)
+            target_action = target_sel.addAction(
+                QIcon.fromTheme("edit-delete"), QLineEdit.TrailingPosition
+            )
         return valid
 
     #
@@ -911,23 +921,31 @@ def new_run_docking_widget():
     def validate(text):
         validate_flex_sel()
 
+    flex_action = None
+
     def validate_flex_sel():
+        nonlocal flex_action
+
         text = flex_sel.text()
-        palette = QApplication.palette(flex_sel)
-        palette.setColor(QPalette.Base, QtCore.Qt.white)
 
         if text.strip() == "":
-            palette.setColor(QPalette.Base, QtCore.Qt.white)
             valid = True
-        try:
-            if cmd.count_atoms(f"({text}) and ({target_sel.text()})") == 0:
-                raise
-            palette.setColor(QPalette.Base, QtCore.Qt.white)
-            valid = True
-        except:
-            palette.setColor(QPalette.Base, QtCore.Qt.red)
-            valid = False
-        flex_sel.setPalette(palette)
+        else:
+            try:
+                if cmd.count_atoms(f"({text}) and ({target_sel.text()})") == 0:
+                    raise
+                valid = True
+            except:
+                valid = False
+        if valid:
+            if flex_action is not None:
+                flex_sel.removeAction(flex_action)
+        else:
+            if flex_action is not None:
+                flex_sel.removeAction(flex_action)
+            flex_action = flex_sel.addAction(
+                QIcon.fromTheme("edit-delete"), QLineEdit.TrailingPosition
+            )
         return valid
 
     #
@@ -949,23 +967,31 @@ def new_run_docking_widget():
     def validate(value):
         validate_box()
 
+    box_action = None
+
     def validate_box():
+        nonlocal box_action
+
         text = box_sel.text()
-        palette = QApplication.palette(box_sel)
-        palette.setColor(QPalette.Base, QtCore.Qt.white)
         try:
             if cmd.count_atoms(text) == 0:
                 raise Exception
         except:
-            palette.setColor(QPalette.Base, QtCore.Qt.red)
-            box_sel.setPalette(palette)
             cmd.delete("vina_box")
+            if box_action is not None:
+                box_sel.removeAction(box_action)
+            box_action = box_sel.addAction(
+                QIcon.fromTheme("edit-delete"), QLineEdit.TrailingPosition
+            )
             return False
         cmd.delete("vina_box")
         display_box_sel("vina_box", text, box_margin_spin.value())
-        box_sel.setPalette(palette)
-        return True
 
+        if box_action is not None:
+            box_sel.removeAction(box_action)
+            box_action = None
+
+        return True
 
     #
     # Miscellaneous options
@@ -1083,7 +1109,6 @@ def new_run_docking_widget():
 
 
 def init_plugin(menu):
-
 
     window = pymol.gui.get_qtwindow()
 

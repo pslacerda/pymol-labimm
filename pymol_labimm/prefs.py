@@ -2,12 +2,23 @@ import platform
 
 import pymol.plugins
 
-
 if platform.platform() == "MacOS":
-    PREFS_GUESSES = {}
+    PREF_GUESSES = {
+        "LABIMM_VINA": "",
+        "LABIMM_OBABEL": "",
+        "LABIMM_ADT_PYTHON": "",
+        "LABIMM_PREPARE_RECEPTOR": "",
+        "LABIMM_PREPARE_FLEXRECEPTOR": "",
+    }
 
 elif platform.platform() == "Windows":
-    PREFS_GUESSES = {}
+    PREF_GUESSES = {
+        "LABIMM_VINA": "",
+        "LABIMM_OBABEL": "",
+        "LABIMM_ADT_PYTHON": "",
+        "LABIMM_PREPARE_RECEPTOR": "",
+        "LABIMM_PREPARE_FLEXRECEPTOR": "",
+    }
 
 else:  # platform == 'Linux'
     PREFS_GUESSES = {
