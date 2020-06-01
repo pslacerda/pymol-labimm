@@ -302,16 +302,14 @@ def process_session(ensemble_collector, pattern, group, max_size, root=None):
                     pm.show("line", ensemble.selection)
                     pm.util.cbas(ensemble.selection)
 
-                    obj_root = f"{root}.{klass}.{i:03}"
-
-                    obj = obj_root
+                    obj = f"{root}.{klass}.{i:03}"
                     pm.create(obj, ensemble.selection)
 
-                    pm.set_property("Class", ensemble.klass)
-                    pm.set_property("S", ensemble.strength)
-                    pm.set_property("S (CS0)", ensemble.clusters[0].strength)
-                    pm.set_property("CD", ensemble.max_center_to_center)
-                    pm.set_property("MD", ensemble.max_dist)
+                    pm.set_property("Class", ensemble.klass, obj)
+                    pm.set_property("S", ensemble.strength, obj)
+                    pm.set_property("S (CS0)", ensemble.clusters[0].strength, obj)
+                    pm.set_property("CD", ensemble.max_center_to_center, obj)
+                    pm.set_property("MD", ensemble.max_dist, obj)
 
                     ensemble.selection = obj
                     ensembles.append(ensemble)
