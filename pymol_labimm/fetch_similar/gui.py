@@ -57,8 +57,13 @@ class FetchSimilarDialog(QDialog):
         self.layout.addRow("Reference chain:", self.ref_chain_line)
 
         self.similarity_combo = QComboBox(self)
+        self.similarity_combo.addItem("100", 100)
         self.similarity_combo.addItem("95", 95)
         self.similarity_combo.addItem("90", 90)
+        self.similarity_combo.addItem("70", 70)
+        self.similarity_combo.addItem("50", 50)
+        self.similarity_combo.addItem("40", 40)
+        self.similarity_combo.addItem("30", 30)
         self.layout.addRow("Similarity threshold:", self.similarity_combo)
 
         self.ligand_line = QLineEdit("", self)
