@@ -1,6 +1,5 @@
 import requests
 from lxml import etree
-
 from pymol import cmd as pm
 
 
@@ -41,13 +40,13 @@ def get_resolution(pdb_id):
 
 @pm.extend
 def fetch_similar(
-        chain_id,
-        similarity=95,
-        ligand=None,
-        dist=5,
-        compounds="organic or inorganic",  # pep_compounds=None,
-        max_resolution=None,
-        max_structures=50,
+    chain_id,
+    similarity=95,
+    ligand=None,
+    dist=5,
+    compounds="organic or inorganic",  # pep_compounds=None,
+    max_resolution=None,
+    max_structures=50,
 ):
     """
 Fetch sequence similar structures from RCSB PDB and optionally keep only

@@ -1,8 +1,6 @@
-
-from .core import fetch_similar
-
 import pymol.gui
 
+from .core import fetch_similar
 
 QWidget = pymol.Qt.QtWidgets.QWidget
 QFileDialog = pymol.Qt.QtWidgets.QFileDialog
@@ -49,7 +47,9 @@ class FetchSimilarDialog(QDialog):
 
         # Form
         self.ref_pdb_line = QLineEdit("", self)
-        self.ref_pdb_line.setValidator(QRegExpValidator(QRegExp("[0-9][A-Za-z0-9]{3}"), self))
+        self.ref_pdb_line.setValidator(
+            QRegExpValidator(QRegExp("[0-9][A-Za-z0-9]{3}"), self)
+        )
         self.layout.addRow("Reference PDB:", self.ref_pdb_line)
 
         self.ref_chain_line = QLineEdit("", self)
@@ -69,7 +69,7 @@ class FetchSimilarDialog(QDialog):
         self.dist_spin.setValue(5.0)
         self.layout.addRow("Distance from ligand:", self.dist_spin)
 
-        self.compounds_line = QLineEdit("organic and inorganic", self)
+        self.compounds_line = QLineEdit("organic or inorganic", self)
         self.layout.addRow("Ligand compounds:", self.compounds_line)
 
         self.max_resol_spin = QDoubleSpinBox(self)
@@ -90,7 +90,7 @@ class FetchSimilarDialog(QDialog):
     def start(self):
         pdb = self.ref_pdb_line.text()
         chain = self.ref_chain_line.text()
-        pdb_chain_id = f'{pdb}.{chain}'
+        pdb_chain_id = f"{pdb}.{chain}"
 
         similarity = self.similarity_combo.currentData()
         ligand = self.ligand_line.text().strip() or None
@@ -106,10 +106,8 @@ class FetchSimilarDialog(QDialog):
             dist,
             compounds,
             max_resolution,
-            max_structures
+            max_structures,
         )
-
-
 
         self.done(QDialog.Accepted)
 
