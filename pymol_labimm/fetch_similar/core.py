@@ -71,8 +71,6 @@ EXAMPLES:
     fetch_similar 6Y2F.A, max_structures=0
     """
 
-    breakpoint()
-
     max_structures = int(max_structures)
     obj = f"{chain_id}.0"
     pm.fetch(chain_id, obj)
