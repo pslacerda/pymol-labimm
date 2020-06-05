@@ -10,7 +10,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="pymol-labimm",
-    version="0.3.3",
+    version="0.3.4",
     description="Some PyMOL utilities",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -28,5 +28,5 @@ setup(
         "Programming Language :: Python :: 3.7",
     ],
     packages=find_packages(),
-    install_requires=["pandas", "scipy", "requests", "cached_property", "patool"],
+    install_requires=["lxml", "pandas", "scipy", "requests", "cached_property", "patool"],
 )
