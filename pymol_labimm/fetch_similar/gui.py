@@ -77,6 +77,9 @@ class FetchSimilarDialog(QDialog):
         self.compounds_line = QLineEdit("organic or inorganic", self)
         self.layout.addRow("Ligand compounds:", self.compounds_line)
 
+        self.prosthetics_line = QLineEdit("HEM FAD", self)
+        self.layout.addRow("Prosthetic groups:", self.prosthetics_line)
+
         self.max_resol_spin = QDoubleSpinBox(self)
         self.max_resol_spin.setRange(0.0, 10.0)
         self.max_resol_spin.setValue(0.0)
@@ -101,6 +104,7 @@ class FetchSimilarDialog(QDialog):
         ligand = self.ligand_line.text().strip() or None
         dist = self.dist_spin.value()
         compounds = self.compounds_line.text()
+        prosthetic_groups = self.prosthetics_line.text()
         max_resolution = self.max_resol_spin.value()
         max_structures = self.max_structs_spin.value()
 
@@ -110,6 +114,7 @@ class FetchSimilarDialog(QDialog):
             ligand,
             dist,
             compounds,
+            prosthetic_groups,
             max_resolution,
             max_structures,
         )

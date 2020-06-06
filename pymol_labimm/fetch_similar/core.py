@@ -45,6 +45,7 @@ def fetch_similar(
     ligand=None,
     dist=5,
     compounds="organic or inorganic",  # pep_compounds=None,
+    prosthetic_groups="HEM FAD",
     max_resolution=None,
     max_structures=50,
 ):
@@ -61,9 +62,10 @@ OPTIONS:
                     evaluation.
     compounds       Selection of atoms that should be considered ligands
                     upon apo computation. Only used when ligand is given.
-    max_resolution  Fetch only X-ray structures with up to such
-                    resolution.
-    max_structures  Fetch at most n structures. 0 for all structures.
+    prothestic_groups   List of ligands to be ignored when evaluating apo.
+    max_resolution      Fetch only X-ray structures with up to such
+                        resolution.
+    max_structures      Fetch at most n structures. 0 for all structures.
 EXAMPLES:
     fetch_similar 2XY9.A, 100
     fetch_similar 2XY9.A, 95, 3ES, 3, organic
@@ -71,7 +73,7 @@ EXAMPLES:
     """
 
     max_structures = int(max_structures)
-    obj = f"{chain_id}.0"
+    obj = f"{chain_id}"
     pm.fetch(chain_id, obj)
 
     sims = []
@@ -85,7 +87,7 @@ EXAMPLES:
         if sim_chain_id.upper() == chain_id.upper():
             continue
 
-        sim_obj = f"{sim_chain_id}.{rank}"
+        sim_obj = f"{sim_chain_id}"
         pm.fetch(sim_chain_id, sim_obj, **{"async": 0})
         pm.align(sim_obj, obj)
 
@@ -101,7 +103,15 @@ EXAMPLES:
                 f" within {dist} of"
                 f"({obj} and (resn {ligand}))"
             )
-            if len(model.atom) != 0:
+            resns = set(a.resn for a in model.atom)
+
+            is_apo = True
+            for resn in resns:
+                if resn not in prosthetic_groups.split():
+                    is_apo = False
+                    break
+
+            if not is_apo:
                 pm.delete(sim_obj)
                 continue
 
