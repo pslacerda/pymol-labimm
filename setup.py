@@ -28,5 +28,14 @@ setup(
         "Programming Language :: Python :: 3.7",
     ],
     packages=find_packages(),
-    install_requires=["lxml", "pandas", "scipy", "requests", "cached_property", "patool"],
+    # TODO remove unused requirements
+    install_requires=[
+        "graphqlclient",
+        "lxml",
+        "pandas",
+        "scipy",
+        "requests",
+        "cached_property",
+        "patool",
+    ],
 )
