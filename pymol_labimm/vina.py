@@ -908,7 +908,7 @@ def new_run_docking_widget():
             if target_action is not None:
                 target_sel.removeAction(target_action)
             target_action = target_sel.addAction(
-                QIcon.fromTheme("edit-delete"), QLineEdit.TrailingPosition
+                QIcon.fromTheme("dialog-error"), QLineEdit.TrailingPosition
             )
         return valid
 
@@ -944,7 +944,7 @@ def new_run_docking_widget():
             if flex_action is not None:
                 flex_sel.removeAction(flex_action)
             flex_action = flex_sel.addAction(
-                QIcon.fromTheme("edit-delete"), QLineEdit.TrailingPosition
+                QIcon.fromTheme("dialog-error"), QLineEdit.TrailingPosition
             )
         return valid
 
@@ -981,7 +981,7 @@ def new_run_docking_widget():
             if box_action is not None:
                 box_sel.removeAction(box_action)
             box_action = box_sel.addAction(
-                QIcon.fromTheme("edit-delete"), QLineEdit.TrailingPosition
+                QIcon.fromTheme("dialog-error"), QLineEdit.TrailingPosition
             )
             return False
         cmd.delete("vina_box")
