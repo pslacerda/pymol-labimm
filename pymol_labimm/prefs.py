@@ -1,3 +1,4 @@
+import os.path
 import platform
 
 import pymol.plugins
@@ -34,3 +35,7 @@ def guess_prefs():
     for pref in PREFS_GUESSES:
         if not pymol.plugins.pref_get(pref):
             pymol.plugins.pref_set(pref, PREFS_GUESSES[pref])
+
+
+PLUGIN_DATA_DIR = os.path.expanduser("~/.pymol/labimm")
+os.makedirs(PLUGIN_DATA_DIR, exist_ok=True)
