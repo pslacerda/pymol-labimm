@@ -14,8 +14,13 @@ from pymol import CmdException
 from pymol import cmd as pm
 from pymol import stored
 
-from ..commons import (disable_feedback, fractional_overlap, get_atoms,
-                       pairwise, settings)
+from ..commons import (
+    disable_feedback,
+    fractional_overlap,
+    get_atoms,
+    pairwise,
+    settings,
+)
 
 
 @dataclass
