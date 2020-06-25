@@ -1,6 +1,35 @@
-import requests
-from lxml import etree
+from ftplib import FTP
 from pymol import cmd as pm
+from graphqlclient import GraphQLClient
+import json
+from functools import lru_cache
+from ..prefs import PLUGIN_DATA_DIR
+
+
+@pm.extend
+def update_cluster_data():
+    """
+The cluster database needs to be updated before the first use of
+the fetch_similar feature. The database server ftp://resources.rcsb.org/sequence/clusters/
+is updated weekly, for new data is prudent to run this command
+weekly.
+    """
+    breakpoint()
+    rscb_server = FTP("resources.rcsb.org")
+    rscb_server.login()
+
+    rscb_server.cwd("/sequence/clusters/")
+    for cluster_fname in [
+        "bc-100.out",
+        "bc-95.out",
+        "bc-90.out",
+        "bc-70.out",
+        "bc-50.out",
+        "bc-40.out",
+        "bc-30.out",
+    ]:
+        with open(PLUGIN_DATA_DIR + "/" + cluster_fname, "wb") as cluster_file:
+            rscb_server.retrbinary("RETR " + cluster_fname, cluster_file.write, blocksize=262144)
 
 
 def find_similar_chain_ids(chain_id, threshold):
@@ -8,34 +37,42 @@ def find_similar_chain_ids(chain_id, threshold):
     chain_id - reference chain id
     threshold - similarity threshold
     """
-    resp = requests.get(
-        f"https://www.rcsb.org/pdb/rest/sequenceCluster"
-        f"?cluster={threshold}"
-        f"&structureId={chain_id}"
-    )
-    tree = etree.fromstring(resp.content)
-    for pdb_chain in tree.xpath("//pdbChain"):
-        sim_chain_id = pdb_chain.get("name")
-        rank = pdb_chain.get("rank")
-        sim_pdb, sim_chain = sim_chain_id.split(".")
-        yield sim_pdb, sim_chain_id, int(rank)
+
+    cluster_fname = f"bc-{threshold}.out"
+    with open(PLUGIN_DATA_DIR + "/" + cluster_fname) as cluster_file:
+        for cluster in cluster_file:
+            if chain_id in cluster:
+                break
+        else:
+            return []
+
+        sim_chain_ids = []
+        for chain_id in cluster.split():
+            pdb, chain = chain_id.split("_")
+            sim_chain_ids.append((pdb.upper(), chain))
+        return sim_chain_ids
 
 
+@lru_cache()
 def get_resolution(pdb_id):
     """
     Get the resolution for a PDB id, or None in case it isn't of an X-ray experiment.
     """
-    ret = requests.get(
-        f"https://www.rcsb.org/pdb/rest/getEntityInfo?structureId={pdb_id}"
+    client = GraphQLClient(endpoint="https://data.rcsb.org/graphql")
+    data = client.execute(
+        query=f"""
+    {{
+        entry(entry_id: "{pdb_id}") {{
+            pdbx_vrpt_summary {{
+                PDB_resolution
+            }}
+      }}
+    }}
+    """
     )
-    tree = etree.fromstring(ret.content)
-    if tree.xpath("//Method")[0].get("name") == "xray":
-        resol = tree.xpath("//PDB")[0].get("resolution")
-        if not resol:
-            return float("nan")
-        return float(resol)
-    else:
-        return None
+    data = json.loads(data)
+    resol = data["data"]["entry"]["pdbx_vrpt_summary"]["PDB_resolution"]
+    return resol
 
 
 @pm.extend
@@ -45,7 +82,7 @@ def fetch_similar(
     ligand=None,
     dist=5,
     compounds="organic or inorganic",  # pep_compounds=None,
-    prosthetic_groups="HEM FAD",
+    prosthetic_groups="HEM FAD NAP NDP ADP FMN",
     max_resolution=None,
     max_structures=50,
 ):
@@ -53,6 +90,10 @@ def fetch_similar(
 Fetch sequence similar structures from RCSB PDB and optionally keep only
 apo structures. Apo are evaluated respective to a choosen ligand on the
 reference chain.
+
+For the first use is needed to update the database with the command
+`update_cluster_data`.
+
 OPTIONS:
     chain_id        Reference structure chain id.
     similarity      Sequence similarity threshold (one of the available
@@ -67,11 +108,13 @@ OPTIONS:
                         resolution.
     max_structures      Fetch at most n structures. 0 for all structures.
 EXAMPLES:
-    fetch_similar 2XY9.A, 100
-    fetch_similar 2XY9.A, 95, 3ES, 3, organic
-    fetch_similar 6Y2F.A, max_structures=0
+    fetch_similar 2XY9_A, 100
+    fetch_similar 2XY9_A, 95, 3ES, 3, organic
+    fetch_similar 6Y2F_A, max_structures=0
+SEE ALSO:
+    update_cluster_data
     """
-
+    
     max_structures = int(max_structures)
     obj = f"{chain_id}"
     pm.fetch(chain_id, obj)
@@ -79,16 +122,16 @@ EXAMPLES:
     sims = []
     similars = find_similar_chain_ids(chain_id, similarity)
     cont = 0
-    for sim_pdb, sim_chain_id, rank in similars:
+    for sim_pdb, sim_chain in similars:
 
         if max_structures != 0 and cont >= max_structures:
             break
 
-        if sim_chain_id.upper() == chain_id.upper():
+        if sim_chain.upper() == chain_id.upper():
             continue
 
-        sim_obj = f"{sim_chain_id}"
-        pm.fetch(sim_chain_id, sim_obj, **{"async": 0})
+        sim_obj = f"{sim_pdb}_{sim_chain}"
+        pm.fetch(sim_obj, **{"async": 0})
         pm.align(sim_obj, obj)
 
         resol = None
@@ -122,5 +165,5 @@ EXAMPLES:
             #         )
 
         cont += 1
-        sims.append((sim_obj, sim_chain_id, sim_pdb, rank, resol))
+        sims.append((sim_obj, sim_chain, sim_pdb, resol))
     return sims

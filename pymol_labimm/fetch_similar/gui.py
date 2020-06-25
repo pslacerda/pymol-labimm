@@ -1,6 +1,7 @@
 import pymol.gui
+import pymol.Qt
 
-from .core import fetch_similar
+from .core import fetch_similar, update_cluster_data
 
 QWidget = pymol.Qt.QtWidgets.QWidget
 QFileDialog = pymol.Qt.QtWidgets.QFileDialog
@@ -77,7 +78,7 @@ class FetchSimilarDialog(QDialog):
         self.compounds_line = QLineEdit("organic or inorganic", self)
         self.layout.addRow("Ligand compounds:", self.compounds_line)
 
-        self.prosthetics_line = QLineEdit("HEM FAD", self)
+        self.prosthetics_line = QLineEdit("HEM FAD NAP NDP ADP FMN", self)
         self.layout.addRow("Prosthetic groups:", self.prosthetics_line)
 
         self.max_resol_spin = QDoubleSpinBox(self)
@@ -94,6 +95,11 @@ class FetchSimilarDialog(QDialog):
         self.fetch_button = QPushButton("Fetch")
         self.layout.addWidget(self.fetch_button)
         self.fetch_button.clicked.connect(self.start)
+
+        # Update DB button
+        self.update_button = QPushButton("Update DB")
+        self.layout.addWidget(self.update_button)
+        self.update_button.clicked.connect(update_cluster_data)
 
     def start(self):
         pdb = self.ref_pdb_line.text()
