@@ -1,7 +1,7 @@
 import pymol.gui
 import pymol.Qt
 
-from .core import fetch_similar, update_cluster_data
+from .shape3d import fetch_similar_shape3d
 
 QWidget = pymol.Qt.QtWidgets.QWidget
 QFileDialog = pymol.Qt.QtWidgets.QFileDialog
@@ -37,7 +37,7 @@ QTextCursor = pymol.Qt.QtGui.QTextCursor
 QIcon = pymol.Qt.QtGui.QIcon
 
 
-class FetchSimilarDialog(QDialog):
+class FetchBlastClusterDialog(QDialog):
     def __init__(self, *vina_args, parent=None):
         super().__init__(parent)
 
@@ -53,19 +53,10 @@ class FetchSimilarDialog(QDialog):
         )
         self.layout.addRow("Reference PDB:", self.ref_pdb_line)
 
-        self.ref_chain_line = QLineEdit("", self)
-        self.ref_chain_line.setValidator(QRegExpValidator(QRegExp("[A-Z]"), self))
-        self.layout.addRow("Reference chain:", self.ref_chain_line)
-
-        self.similarity_combo = QComboBox(self)
-        self.similarity_combo.addItem("100", 100)
-        self.similarity_combo.addItem("95", 95)
-        self.similarity_combo.addItem("90", 90)
-        self.similarity_combo.addItem("70", 70)
-        self.similarity_combo.addItem("50", 50)
-        self.similarity_combo.addItem("40", 40)
-        self.similarity_combo.addItem("30", 30)
-        self.layout.addRow("Similarity threshold:", self.similarity_combo)
+        self.similarity_spin = QDoubleSpinBox(self)
+        self.similarity_spin.setRange(0.0, 1.0)
+        self.similarity_spin.setValue(0.5)
+        self.layout.addRow("Min similarity:", self.similarity_spin)
 
         self.ligand_line = QLineEdit("", self)
         self.layout.addRow("Reference ligand:", self.ligand_line)
@@ -83,46 +74,33 @@ class FetchSimilarDialog(QDialog):
 
         self.max_resol_spin = QDoubleSpinBox(self)
         self.max_resol_spin.setRange(0.0, 10.0)
-        self.max_resol_spin.setValue(0.0)
+        self.max_resol_spin.setValue(2.0)
         self.layout.addRow("Max resolution:", self.max_resol_spin)
-
-        self.max_structs_spin = QSpinBox(self)
-        self.max_structs_spin.setRange(0, 1000)
-        self.max_structs_spin.setValue(50)
-        self.layout.addRow("Max structures:", self.max_structs_spin)
 
         # Fetch button
         self.fetch_button = QPushButton("Fetch")
         self.layout.addWidget(self.fetch_button)
         self.fetch_button.clicked.connect(self.start)
 
-        # Update DB button
-        self.update_button = QPushButton("Update DB")
-        self.layout.addWidget(self.update_button)
-        self.update_button.clicked.connect(update_cluster_data)
-
     def start(self):
-        pdb = self.ref_pdb_line.text()
-        chain = self.ref_chain_line.text()
-        pdb_chain_id = f"{pdb}.{chain}"
+        pdb_id = self.ref_pdb_line.text()
 
-        similarity = self.similarity_combo.currentData()
+        min_similarity = self.similarity_spin.value()
+        max_resolution = self.max_resol_spin.value()
         ligand = self.ligand_line.text().strip() or None
         dist = self.dist_spin.value()
         compounds = self.compounds_line.text()
         prosthetic_groups = self.prosthetics_line.text()
-        max_resolution = self.max_resol_spin.value()
-        max_structures = self.max_structs_spin.value()
 
-        fetch_similar(
-            pdb_chain_id,
-            similarity,
+        fetch_similar_shape3d(
+            pdb_id,
+            min_similarity,
+            max_resolution,
             ligand,
             dist,
             compounds,
             prosthetic_groups,
-            max_resolution,
-            max_structures,
+
         )
 
         self.done(QDialog.Accepted)
@@ -130,9 +108,9 @@ class FetchSimilarDialog(QDialog):
 
 def init_gui(menu):
 
-    action = menu.addAction("Fetch similar")
+    action = menu.addAction("Fetch similar (Shape 3D)")
 
     @action.triggered.connect
     def triggered():
-        dialog = FetchSimilarDialog()
+        dialog = FetchBlastClusterDialog()
         dialog.exec_()
