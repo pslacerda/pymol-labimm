@@ -4,7 +4,8 @@ import sys
 import pymol.gui
 
 from .fetch_similar.blast_gui import init_gui as fetch_similar_blast_init_gui
-from .fetch_similar.shape3d_gui import init_gui as fetch_similar_shape3d_init_gui
+from .fetch_similar.shape3d_gui import \
+    init_gui as fetch_similar_shape3d_init_gui
 from .ftmap.core import init_plugin_cli as ftmap_init_plugin_cli
 from .ftmap.gui import init_plugin_gui as ftmap_init_plugin_gui
 from .prefs import guess_prefs

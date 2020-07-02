@@ -1,8 +1,10 @@
+from dataclasses import dataclass
+from typing import Optional
+
 import requests
 from pymol import cmd as pm
-from dataclasses import dataclass
+
 from .blast import get_resolution
-from typing import Optional
 
 
 @dataclass
@@ -13,40 +15,56 @@ class SimilarStructure:
 
 
 @pm.extend
-def fetch_similar_shape3d(pdb_id: str,
-                            min_similarity: float = 0,
-                            max_resolution: Optional[float] = None,
-                            ligand: Optional[str] = None,
-                            dist: float = 5.0,
-                            compounds: str = "organic or inorganic",
-                            prosthetic_groups: str = "HEM FAD NAP NDP ADP FMN",
-                            ) -> [SimilarStructure]:
+def fetch_similar_shape3d(
+    pdb_id: str,
+    min_similarity: float = 0,
+    max_resolution: Optional[float] = None,
+    ligand: Optional[str] = None,
+    dist: float = 5.0,
+    compounds: str = "organic or inorganic",
+    prosthetic_groups: str = "HEM FAD NAP NDP ADP FMN",
+) -> [SimilarStructure]:
+    """
+Fetch similar structures using the 3D-Shape algorithm.
+
+https://search.rcsb.org/
+
+OPTIONS:
+    pdb_id          Reference PDB id.
+    min_similarity  3D-Shape score threshold.
+    max_resolution  Fetch only structures up to such resolution.
+    ligand          Refrence ligand PDB id for apo evaluation.
+    dist            Distance cut-off around reference ligand for apo
+                    evaluation. Only used when ligand is given.
+    compounds       Selection that shold be considered ligands upon apo
+                    evaluation. Only used when ligand is given.
+    prosthetic_groups   List of ligands to be ignored when evaluating apo.
+EXAMPLES:
+    fetch_similar_shape3d 2XY9
+SEE ALSO:
+    fetch_similar_blast
+    """
     ret = requests.post(
         url="https://search.rcsb.org/rcsbsearch/v1/query",
         headers={"Content-Type": "application/json"},
         json={
-              "query": {
+            "query": {
                 "type": "terminal",
                 "service": "structure",
                 "parameters": {
-                  "value": {
-                    "entry_id": pdb_id,
-                    "assembly_id": "1"
-                  },
-                  "operator": "strict_shape_match"
+                    "value": {"entry_id": pdb_id, "assembly_id": "1"},
+                    "operator": "strict_shape_match",
                 },
-                "node_id": 1
-              },
-              "return_type": "entry"
-        }
+                "node_id": 1,
+            },
+            "return_type": "entry",
+        },
     )
 
     similars = []
     for i, result in enumerate(ret.json()["result_set"]):
         sim = SimilarStructure(
-            pdb_id=result["identifier"],
-            score=result["score"],
-            resolution=None,
+            pdb_id=result["identifier"], score=result["score"], resolution=None,
         )
 
         # Chek the similarity threshold
@@ -88,7 +106,7 @@ def fetch_similar_shape3d(pdb_id: str,
                     continue
 
         # Set the score property
-        if hasattr(pm, 'set_property'):
+        if hasattr(pm, "set_property"):
             pm.set_property("shape3d_score", sim.score, sim.pdb_id)
 
         # Go on

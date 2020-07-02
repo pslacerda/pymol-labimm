@@ -1,8 +1,10 @@
-from ftplib import FTP
-from pymol import cmd as pm
-from graphqlclient import GraphQLClient
 import json
+from ftplib import FTP
 from functools import lru_cache
+
+from graphqlclient import GraphQLClient
+from pymol import cmd as pm
+
 from ..prefs import PLUGIN_DATA_DIR
 
 
@@ -27,7 +29,9 @@ is updated weekly, for new data is prudent to run this command weekly.
         "bc-30.out",
     ]:
         with open(PLUGIN_DATA_DIR + "/" + cluster_fname, "wb") as cluster_file:
-            rscb_server.retrbinary("RETR " + cluster_fname, cluster_file.write, blocksize=262144)
+            rscb_server.retrbinary(
+                "RETR " + cluster_fname, cluster_file.write, blocksize=262144
+            )
 
 
 def find_similar_chain_ids(chain_id, threshold):
@@ -64,7 +68,7 @@ def get_resolution(pdb_id):
             pdbx_vrpt_summary {{
                 PDB_resolution
             }}
-      }}update_blast_cluster_data
+      }}
     }}
     """
     )
@@ -113,7 +117,7 @@ SEE ALSO:
     update_cluster_data
     fetch_similar_shape3d
     """
-    
+    breakpoint()
     max_structures = int(max_structures)
     obj = f"{chain_id}"
     pm.fetch(chain_id, obj)

@@ -100,7 +100,6 @@ class FetchBlastClusterDialog(QDialog):
             dist,
             compounds,
             prosthetic_groups,
-
         )
 
         self.done(QDialog.Accepted)
