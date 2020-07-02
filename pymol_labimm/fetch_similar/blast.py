@@ -117,7 +117,6 @@ SEE ALSO:
     update_cluster_data
     fetch_similar_shape3d
     """
-    breakpoint()
     max_structures = int(max_structures)
     obj = f"{chain_id}"
     pm.fetch(chain_id, obj)
