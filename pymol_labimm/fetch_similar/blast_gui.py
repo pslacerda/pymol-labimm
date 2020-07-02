@@ -104,7 +104,7 @@ class FetchBlastClusterDialog(QDialog):
     def start(self):
         pdb = self.ref_pdb_line.text()
         chain = self.ref_chain_line.text()
-        pdb_chain_id = f"{pdb}.{chain}"
+        pdb_chain_id = f"{pdb}_{chain}"
 
         similarity = self.similarity_combo.currentData()
         ligand = self.ligand_line.text().strip() or None
