@@ -3,22 +3,13 @@
 This scripts scraps the Binding MOAD looking for protein-peptide complexes. It goes further and also look for unbound
 95% similar structures.
 """
-import collections
-import os
-import shutil
-import sys
-
 import pandas as pd
-import pymol
-import requests
 import requests_cache
-from lxml import etree
 from pymol import cmd as pm
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
 
-from pymol_labimm.fetch_similar.blast import (find_similar_chain_ids,
-                                              get_resolution)
+requests_cache.install_cache("requests_cache")
+
+from pymol_labimm.fetch_similar.blast import find_similar_chain_ids, get_resolution
 
 
 def convert_unit(value, unit):
@@ -41,8 +32,6 @@ def convert_unit(value, unit):
 
 AMINOACIDS = "ALA ARG ASN ASP CYS GLN GLU GLY HIS ILE LEU LYS MET PHE PRO SER THR TRP TYR VAL PYL SEC"
 
-is_peptide = False
-
 
 def parse_binding_moad(moad_csv_file):
     entries = []
@@ -56,7 +45,7 @@ def parse_binding_moad(moad_csv_file):
 
         # PDB
         if parts[2]:
-            pdb_id = parts[2]
+            pdb_id = parts[2].upper()
 
         # There is a ligand record
         if parts[3]:
@@ -71,8 +60,8 @@ def parse_binding_moad(moad_csv_file):
                 ligand_smiles = parts[9]
                 entry = {
                     "type": "ligand",
-                    "pdb_id": pdb_id.lower(),
-                    "ligand_id": ligand_id.lower(),
+                    "pdb_id": pdb_id,
+                    "ligand_id": ligand_id,
                     "ligand_smiles": ligand_smiles,
                     "ligand_resid": resid,
                     "ligand_chain": chain,
@@ -112,50 +101,80 @@ def parse_binding_moad(moad_csv_file):
     entries = entries[entries.pdb_id.isin(counts[counts > 0].index)]
     entries = entries.groupby(["pdb_id"]).first().reset_index()
 
+
     #
-    # Find APO95
+    # Find apo/holo pairs
     #
     new_entries = []
     for i, entry in entries.iterrows():
+
+        if entry.pdb_id != "5N70":
+            continue
+        breakpoint()
+
         pm.reinitialize()
 
-        pm.fetch(entry.pdb_id)
+        pm.fetch(entry.pdb_id, type="pdb1")
+        if entry.pdb_id not in pm.get_object_list():
+            continue
 
+        # Restrict to chains named 'A'
         if "A" not in pm.get_chains():
             continue
 
-        # Look for similar chains
-        # Restrict to chains named 'A'
-        cont = 0
+        # Store the fasta string length
+        ref_len = len(pm.get_fastastr(entry.pdb_id))
+
+        # Look for similar chains using the Blast clusterization algorithm
         similars = find_similar_chain_ids(entry.pdb_id.upper() + "_A", 95)
         for sim_pdb, sim_chain in similars:
 
+            if sim_pdb != "5N71":
+                continue
+            breakpoint()
+
             if sim_pdb == entry.pdb_id.upper():
                 continue
-            if sim_chain != "A":
+
+            pm.fetch(sim_pdb, type="pdb1")
+            if sim_pdb not in pm.get_object_list():
                 continue
 
-            sim_obj = f"{sim_pdb}_{sim_chain}"
-            pm.fetch(sim_pdb)
-            pm.align(f"{sim_pdb} and chain A", entry.pdb_id)
+            # Remove structures with different number of aminoacids. I'm
+            # considering that peptides impact less than 50 characters on
+            # the fasta string.
+            cur_len = len(pm.get_fastastr(sim_pdb))
+            if abs(ref_len - cur_len) >= 50:
+                pm.delete(sim_pdb)
+                continue
+
+            # Remove alternative conformations, which may be useful for docking.
+            pm.remove('not (alt "" or alt A)')
 
             # Check the resolution
             resol = get_resolution(sim_pdb)
             if resol is None or resol > 2.5:
-                pm.delete(sim_obj)
+                pm.delete(sim_pdb)
                 continue
 
+            # Align the chains
+            pm.align(sim_pdb, entry.pdb_id)
+
             # Check nearby ligands
+            is_apo = True
             model = pm.get_model(
                 f"({sim_pdb} and (organic or inorganic)) within 5 of ({entry.pdb_id} and (bysegi resid {entry.ligand_resid} and chain {entry.ligand_chain}))"
             )
-
             resns = set(a.resn for a in model.atom)
             for resn in resns:
+                # ignore if is a prosthetic group
                 prosthetic_groups = "HEM FAD NAP NDP ADP FMN"
                 if resn not in prosthetic_groups.split():
-                    pm.delete(sim_obj)
-                    continue
+                    pm.delete(sim_pdb)
+                    is_apo = False
+                    break
+            if not is_apo:
+                continue
 
             # Check nearby peptides
             model = pm.get_model(
@@ -166,15 +185,21 @@ def parse_binding_moad(moad_csv_file):
                 fasta = pm.get_fastastr(
                     f"bs. {sim_pdb} and chain {at.chain} and resid {at.resi}"
                 )
-                if len(fasta.split("\n")[1]) <= 16:
-                    pm.delete(sim_obj)
-                    is_apo = False
-                    break
+                for j, fast in enumerate(fasta.split("\n>")):
+                    # Peptides have a fasta string smaller than 25 characters
+                    if len(fast) <= 25:
+                        pm.delete(sim_pdb)
+                        is_apo = False
+                        break
                 if not is_apo:
                     break
             if not is_apo:
                 continue
-            new_entries.append({**entry, "apo95": sim_pdb})
+
+            # Found a pair apo/holo
+            new_entries.append({**entry, "apo95_pdb": sim_pdb})
+            pm.save(f"{entry.pdb_id}.pdb", entry.pdb_id)
+            pm.save(f"{sim_pdb}.pdb", sim_pdb)
             break
         else:
             continue

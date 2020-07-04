@@ -1,71 +1,44 @@
-,pdb_id,type,ligand_id,ligand_smiles,ligand_resid,ligand_chain,affinity_measure,affinity_value,apo95
-0,1awi,ligand,pro pro pro pro pro pro pro pro pro pro,O=C([O-])C1N(C(=O)C2N(C(=O)C3N(C(=O)C4N(C(=O)C5N(C(=O)C6N(C(=O)C7N(C(=O)C8N(C(=O)C9N(C(=O)C%10[N+H2]CCC%10)CCC9)CCC8)CCC7)CCC6)CCC5)CCC4)CCC3)CCC2)CCC1,1,P,Kd,90000.0,4X25
-1,1jq9,ligand,phe leu ser tyr lys,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])Cc1ccccc1)CC(C)C)CO)Cc1ccc(O)cc1)CCCC[N+H3],1,P,Kd,3.57,2DPZ
-2,1lb6,ligand,lys gln glu pro gln glu ile asp phe,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C1N(C(=O)C(NC(=O)C(NC(=O)C([N+H3])CCCC[N+H3])CCC(=O)N)CCC(=O)[O-])CCC1)CCC(=O)N)CCC(=O)[O-])C(CC)C)CC(=O)[O-])Cc1ccccc1,601,B,Kd,84000.0,1LB4
-3,1mf4,ligand,val ala phe arg ser,O=C(NC(C(=O)NC(C(=O)NC(C(=O)NC(C=O)CO)CCCNC(=[N+H2])N)Cc1ccccc1)C)C([N+H3])C(C)C,1,B,Ki,10.2,1SZ8
-4,1mfg,ligand,glu tyr leu gly leu asp val pro val,O=C([O-])C(NC(=O)C1N(C(=O)C(NC(=O)C(NC(=O)C(NC(=O)CNC(=O)C(NC(=O)C(NC(=O)C([N+H3])CCC(=O)[O-])Cc2ccc(O)cc2)CC(C)C)CC(C)C)CC(=O)[O-])C(C)C)CCC1)C(C)C,1247,B,Kd,50000.0,2H3L
-5,1mi5,ligand,phe leu arg gly arg ala tyr gly leu,O=C([O-])C(NC(=O)CNC(=O)C(NC(=O)C(NC(=O)C(NC(=O)CNC(=O)C(NC(=O)C(NC(=O)C([N+H3])Cc1ccccc1)CC(C)C)CCCNC(=[N+H2])N)CCCNC(=[N+H2])N)C)Cc1ccc(O)cc1)CC(C)C,1,C,Kd,10000.0,6P2C
-6,1obx,ligand,glu thr leu glu asp ser val phe,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])CC(=O)[O-])CO)C(C)C)Cc1ccccc1,5,B,Kd,1900.0,1R6J
-7,1oxq,ligand,ala val pro ile ala gln lys ser glu,O=C(NC(C(=O)N1C(C(=O)NC(C=O)C(CC)C)CCC1)C(C)C)C([N+H3])C,1,F,Ki,500.0,3F7G
-8,1tw6,ligand,ala val pro ile ala gln lys ser glu,O=C(NC(C(=O)N1C(C(=O)NC(C=O)C(CC)C)CCC1)C(C)C)C([N+H3])C,1,C,Ki,0.34,3F7I
-9,1utc,ligand,thr leu pro trp asp leu trp thr thr,O=C(NC(C(=O)N1C(C(=O)NC(C(=O)NC(C(=O)NC(C(=O)NC(C=O)Cc2c3c([nH]c2)cccc3)CC(C)C)CC(=O)[O-])Cc2c3c([nH]c2)cccc3)CCC1)CC(C)C)C([N+H3])C(O)C,1,P,Kd,28000.0,4G55
-10,1w9o,ligand,thr asn glu tyr tyr val,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])CC(=O)N)CCC(=O)[O-])Cc1ccc(O)cc1)Cc1ccc(O)cc1)C(C)C,2,S,Kd,740000.0,1N99
-11,1y7l,ligand,gly ile asp asp gly met asn leu asn ile,n/a,264,P,Ki,130.0,7C35
-12,1ywo,ligand,gln pro pro val pro pro gln arg pro met,S(CCC(NC(=O)C1N(C(=O)C(NC(=O)C(NC(=O)C2N(C(=O)C3N(C(=O)C(NC(=O)C4N(C(=O)C5N(C(=O)C([N+H3])CCC(=O)N)CCC5)CCC4)C(C)C)CCC3)CCC2)CCC(=O)N)CCCNC(=[N+H2])N)CCC1)C(=O)[O-])C,1,P,Kd,12500.0,1YWP
-13,2ak5,ligand,arg pro pro lys pro arg pro arg,n/a,904,D,Kd,14000.0,2P4R
-14,2bnq,ligand,ser leu leu met trp ile thr gln val,S(CCC(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])CO)CC(C)C)CC(C)C)C(=O)NC(C(=O)NC(C(=O)NC(C(=O)NC(C(=O)NC(C=O)C(C)C)CCC(=O)N)C(O)C)C(CC)C)Cc1c2c([nH]c1)cccc2)C,1,C,Kd,5000.0,6TDR
-15,2cv3,ligand,thr thr leu lys phe pro ser asp trp asp asp,n/a,256,B,ic50,270.0,2V35
-16,2hl3,ligand,glu glu gln glu glu tyr,O=C([O-])C(NC(=O)C(NC(=O)C([N+H3])CCC(=O)[O-])CCC(=O)[O-])Cc1ccc(O)cc1,266,C,Kd,170.0,2HKN
-17,2ho2,ligand,pro pro pro pro pro pro pro pro pro leu,O=C(NC(C=O)CC(C)C)C1N(C(=O)C2N(C(=O)C3N(C(=O)C4N(C(=O)C5N(C(=O)C6N(C(=O)C7N(C(=O)C8N(C(=O)C9[N+H2]CCC9)CCC8)CCC7)CCC6)CCC5)CCC4)CCC3)CCC2)CCC1,1,B,Kd,116000.0,2IDH
-18,2o9v,ligand,val pro pro pro val pro pro pro pro ser,O=C(C([N+H3])C(C)C)N1C(C(=O)N2C(C(=O)N3C(C(=O)NC(C(=O)N4C(C(=O)N5C(C(=O)N6C(C(=O)N7C(C(=O)NC(C=O)CO)CCC7)CCC6)CCC5)CCC4)C(C)C)CCC3)CCC2)CCC1,45,B,Kd,288000.0,2O2W
-19,2peh,ligand,lys arg lys ser arg trp asp glu thr pro,O=C(NC(C(=O)NC(C(=O)NC(C(=O)NC(C(=O)NC(C(=O)N1C(C=O)CCC1)C)CCC(=O)[O-])CC(=O)[O-])Cc1c2c([nH]c1)cccc2)CCCNC(=[N+H2])N)C(NC(=O)C(NC(=O)C([N+H3])C)C)CO,333,C,Kd,1100.0,2PE8
-20,2ql9,ligand,gln gly his gly glu,O=C([O-])C(NC(=O)CNC(=O)C(NC(=O)CNC(=O)C([N+H3])CCC(=O)N)Cc1nc[nH]c1)CCC(=O)[O-],810,G,Ki,0.94,4JB8
-21,2r3y,ligand,asp asn arg leu gly leu val tyr trp phe,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])C(C)C)Cc1ccc(O)cc1)Cc1c2c([nH]c1)cccc2)Cc1ccccc1,407,D,Kd,6500.0,4RR1
-22,2vj0,ligand,phe glu asp asn phe val pro,O=C(NCC(=O)NC(C(=O)NC(C(=O)NC(C(=O)NC(C(=O)N1C(C=O)CCC1)C(C)C)Cc1ccccc1)CC(=O)N)CC(=O)[O-])C([N+H3])Cc1ccccc1,1,Q,Kd,21000.0,3HS8
-23,2vl1,ligand,gly gly,O=C([O-])CNC(=O)C[N+H3],601,A,Ki,45000000.0,2V8D
-24,2wa8,ligand,phe arg ser lys gly glu glu leu phe thr,O=C(NC(C(=O)NC(C(=O)NC(C(=O)NCC=O)CCCC[N+H3])CO)CCCNC(=[N+H2])N)C([N+H3])Cc1ccccc1,1,B,Kd,3800.0,1LZW
-25,3d9t,ligand,ala thr pro phe gln glu,O=C([N+H3])C(NC(=O)C1N(C(=O)C(NC(=O)C([N+H3])C)C(O)C)CCC1)Cc1ccccc1,1,C,Kd,48.0,4KMN
-26,3diw,ligand,asn gln leu ala trp phe asp thr asp leu,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])CCC(=O)N)CC(C)C)C)Cc1c2c([nH]c1)cccc2)Cc1ccccc1)CC(=O)[O-])C(O)C)CC(=O)[O-])CC(C)C,773,C,Kd,190.0,3DJ1
-27,3drg,ligand,arg pro pro gly phe ser pro phe ala,O=C(NC(C(=O)N1C(C(=O)NC(C(=O)NC(C=O)C)Cc2ccccc2)CCC1)CO)C(NC(=O)CNC(=O)C1N(C(=O)C2N(C(=O)C([N+H3])CCCNC(=[N+H2])N)CCC2)CCC1)Cc1ccccc1,1,B,Kd,100.0,3FTO
-28,3f9w,ligand,ala lys arg his arg lys val leu arg asp,O=C(NC(C=O)CC(C)C)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])C)CCCNC(=[N+H2])N)Cc1nc[nH]c1)C)CCCC[N+H3])C(C)C,16,E,Kd,19000.0,5V2N
-29,3gjf,ligand,ser leu leu met trp ile thr gln val,S(CCC(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])CO)CC(C)C)CC(C)C)C(=O)NC(C(=O)NC(C(=O)NC(C(=O)NC(C(=O)NC(C=O)C(C)C)CCC(=O)N)C(O)C)C(CC)C)Cc1c2c([nH]c1)cccc2)C,1,C,Kd,46.0,6VR1
-30,3nim,ligand,arg arg ala ala,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])CCCNC(=[N+H2])N)CCCNC(=[N+H2])N)C)C,1,X,Kd,17700.0,3NIK
-31,3obu,ligand,pro glu pro thr ala pro pro glu glu,O=C([O-])C(NC(=O)C(NC(=O)C1N(C(=O)C2N(C(=O)C(NC(=O)C(NC(=O)C3N(C(=O)C(NC(=O)C4[N+H2]CCC4)CCC(=O)[O-])CCC3)C(O)C)C)CCC2)CCC1)CCC(=O)[O-])CCC(=O)[O-],5,B,Kd,50000.0,3OBS
-32,3r42,ligand,gln val pro ser asp pro tyr asn tyr,O=C(NC(C(=O)N1C(C(=O)NC(C(=O)NC(C(=O)N2C(C(=O)NC(C(=O)NC(C=O)CC(=O)N)Cc3ccc(O)cc3)CCC2)CC(=O)[O-])CO)CCC1)C(C)C)C([N+H3])CCC(=O)N,445,B,Kd,84000.0,1UZX
-33,3sou,ligand,ala arg thr lys gln thr ala arg lys,O=C(NC(C(=O)NC(C(=O)NC(C(=O)NC(C(=O)NC(C=O)CCCNC(=[N+H2])N)C)C(O)C)CCC(=O)N)CCCC[N+H3])C(NC(=O)C(NC(=O)C([N+H3])C)CCCNC(=[N+H2])N)C(O)C,1,D,Kd,2500.0,3ZVY
-34,3wol,ligand,val tyr,O=C([O-])C(NC(=O)C([N+H3])C(C)C)Cc1ccc(O)cc1,801,B,Ki,410000.0,3WOK
-35,4btb,ligand,pro pro pro pro pro pro pro pro pro,O=C(N1C(C(=O)N2C(C(=O)N3C(C(=O)N4C(C=O)CCC4)CCC3)CCC2)CCC1)C1N(C(=O)C2N(C(=O)C3N(C(=O)C4N(C(=O)C5[N+H2]CCC5)CCC4)CCC3)CCC2)CCC1,0,C,Kd,9800.0,4BT8
-36,4ezw,ligand,asn arg leu leu leu thr gly,O=C(NC(C(=O)NC(C(=O)NC(C(=O)NC(C(=O)NC(C=O)C(O)C)CC(C)C)CC(C)C)CC(C)C)CCCNC(=[N+H2])N)C([N+H3])CC(=O)N,1,E,Kd,1000.0,4JNF
-37,4fys,ligand,val tyr ile his pro phe,O=C(NC(C(=O)NC(C(=O)NC(C(=O)N1C(C=O)CCC1)Cc1nc[nH]c1)C(CC)C)Cc1ccc(O)cc1)C([N+H3])C(C)C,1,C,Kd,15000.0,6U7G
-38,4hxj,ligand,arg gly thr,O=C([O-])C(NC(=O)CNC(=O)C([N+H3])CCCNC(=[N+H2])N)C(O)C,760,C,Kd,74300.0,4Y92
-39,4in9,ligand,ser trp phe pro,O=C(NC(C(=O)NC(C(=O)N1C(C(=O)[O-])CCC1)Cc1ccccc1)Cc1c2c([nH]c1)cccc2)C([N+H3])CO,1,B,Ki,10700.0,4R3V
-40,4jff,ligand,glu leu ala gly ile gly ile leu thr val,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)CNC(=O)C(NC(=O)CNC(=O)C(NC(=O)C(NC(=O)C([N+H3])CCC(=O)[O-])CC(C)C)C)C(CC)C)C(CC)C)CC(C)C)C(O)C)C(C)C,1,C,Kd,0.060000000000000005,6TDR
-41,4nxq,ligand,glu asn gln lys glu tyr phe phe,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])CC(=O)N)CCC(=O)N)CCCC[N+H3])CCC(=O)[O-])Cc1ccc(O)cc1)Cc1ccccc1)Cc1ccccc1,3,E,Kd,18000.0,4NXP
-42,4ny3,ligand,thr pro asp tyr phe leu,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C1[N+H2]CCC1)CC(=O)[O-])Cc1ccc(O)cc1)Cc1ccccc1)CC(C)C,305,D,Kd,49500.0,2G62
-43,4ou3,ligand,cys asn gly arg cys gly,n/a,1,B,Ki,38700.0,5LG6
-44,4p0a,ligand,thr glu asp asn asp asp asp leu tyr gly,O=C(NC(C=O)Cc1ccc(O)cc1)C([N+H3])CC(C)C,803,D,Kd,30300.0,4JUY
-45,4z0u,ligand,trp met asp phe asp asp asp ile pro phe,O=C([O-])C(NC(=O)C1N(C(=O)C(NC(=O)C([N+H3])CC(=O)[O-])C(CC)C)CCC1)Cc1ccccc1,174,E,Kd,2000.0,1GOB
-46,4z76,ligand,leu tyr leu val cys gly glu arg val,SCC(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])CC(C)C)Cc1ccc(O)cc1)CC(C)C)C(C)C)C(=O)NCC(=O)NC(C(=O)NC(C(=O)NC(C(=O)[O-])C(C)C)CCCNC(=[N+H2])N)CCC(=O)[O-],1,F,Kd,13600.0,4Z78
-47,5aei,ligand,lys arg lys arg lys arg lys arg lys arg,O=C(NC(C(=O)NC(C(=O)NC(C(=O)NC(C(=O)NC(C=O)CCCC[N+H3])CCCNC(=[N+H2])N)CCCC[N+H3])CCCNC(=[N+H2])N)CCCC[N+H3])C([N+H3])CCCNC(=[N+H2])N,1,F,Kd,1.1,6S9N
-48,5e1m,ligand,pro pro lys arg ile ala,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C1N(C(=O)C2[N+H2]CCC2)CCC1)CCCC[N+H3])CCCNC(=[N+H2])N)C(CC)C)C,1,E,Kd,2.8,2EX4
-49,5e2q,ligand,asp arg val tyr ile his pro phe,O=C(NC(C(=O)N1C(C(=O)[N+H3])CCC1)Cc1nc[nH]c1)C(NC(=O)C([N+H3])Cc1ccc(O)cc1)C(CC)C,1,B,Kd,1640.0,3FVY
-50,5e6o,ligand,trp glu glu leu,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])Cc1c2c([nH]c1)cccc2)CCC(=O)[O-])CCC(=O)[O-])CC(C)C,1,H,Kd,76900.0,5AZH
-51,5elq,ligand,arg glu asp gln glu thr ala val,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])CCC(=O)[O-])CC(=O)[O-])CCC(=O)N)CCC(=O)[O-])C(O)C)C)C(C)C,201,P,Kd,2000.0,3QDO
-52,5gu4,ligand,asp asp met gly phe gly leu phe asp,O=C(NC(C(=O)NC(C=O)CC(=O)[O-])Cc1ccccc1)C(NC(=O)CNC(=O)C(NC(=O)C[N+H3])Cc1ccccc1)CC(C)C,2,C,Kd,3400.0,4Q2V
-53,5hff,ligand,thr lys asn tyr lys gln phe ser val,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])C)CC(=O)N)Cc1ccc(O)cc1)CCCC[N+H3])CCC(=O)N)Cc1ccccc1)CO)C(C)C,2,B,Kd,500.0,5HET
-54,5isz,ligand,gly ile leu gly phe val phe thr leu,O=C(NC(C=O)CC(C)C)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)CNC(=O)C(NC(=O)C(NC(=O)C[N+H3])C(CC)C)CC(C)C)Cc1ccccc1)C(C)C)Cc1ccccc1)C(O)C,1,C,Kd,27.0,6TDR
-55,5jhd,ligand,gly ile leu gly phe val phe thr leu,O=C(NC(C=O)CC(C)C)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)CNC(=O)C(NC(=O)C(NC(=O)C[N+H3])C(CC)C)CC(C)C)Cc1ccccc1)C(C)C)Cc1ccccc1)C(O)C,1,H,Kd,37.0,6VR1
-56,5lb7,ligand,leu ser pro asp ser phe leu asn asp,O=C(NC(C(=O)NC(C=O)CC(C)C)Cc1ccccc1)C([N+H3])CO,0,C,Kd,9000.0,5NBT
-57,5lyn,ligand,pro thr val glu glu val asp,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C1[N+H2]CCC1)C(O)C)C(C)C)CCC(=O)[O-])CCC(=O)[O-])C(C)C)CC(=O)[O-],1,D,Kd,9040.0,5LYP
-58,5n70,ligand,ala phe arg ile pro leu thr arg,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C1N(C(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])C)Cc2ccccc2)CCCNC(=[N+H2])N)C(CC)C)CCC1)CC(C)C)C(O)C)CCCNC(=[N+H2])N,5,B,Kd,3.0,5N71
-59,5t8r,ligand,ala arg thr lys gln thr ala arg lys ser,O=C(NC(C(=O)NC(C(=O)NC(C(=O)NC(C=O)C)C(O)C)C)CCCC[N+H3])C(NC(=O)C(NC(=O)C([N+H3])C)C)C(O)C,1,E,Kd,51000.0,4QF2
-60,5vnf,ligand,val thr ser val val,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])C)C)CO)C(C)C)C(C)C,7,D,Kd,14200.0,2NUT
-61,5w7i,ligand,gly val val ala ser gln pro ala arg val,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C1N(C(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C[N+H3])C(C)C)C(C)C)C)CO)CCC(=O)N)CCC1)C)C)C(C)C,1,D,Kd,11000.0,3EU9
-62,5xn3,ligand,arg gly asp ile asn asn asn val,O=C(NC(C(=O)NC(C(=O)NC(C(=O)NC(C=O)C(C)C)CC(=O)N)CC(=O)N)CC(=O)N)C(NC(=O)C(NC(=O)CNC(=O)C([N+H3])CCCNC(=[N+H2])N)CC(=O)[O-])C(CC)C,1,B,Kd,671.0,3EMW
-63,5y24,ligand,gly met pro arg gly ala,S(CCC(NC(=O)C[N+H3])C(=O)N1C(C(=O)NC(C(=O)NCC(=O)NC(C(=O)[O-])C)CCCNC(=[N+H2])N)CCC1)C,1,D,Kd,4.6,5XYB
-64,5yba,ligand,glu tyr gly pro lys trp asn lys,O=C(NCC(=O)N1C(C(=O)NC(C(=O)NC(C(=O)NC(C=O)CC(=O)N)Cc2c3c([nH]c2)cccc3)CCCC[N+H3])CCC1)C([N+H3])Cc1ccc(O)cc1,2,B,Kd,16810.0,5YB9
-65,5ygf,ligand,asp gln gly arg gly arg arg arg pro,O=C(NC(C(=O)NCC(=O)NC(C(=O)NCC(=O)NC(C(=O)NC(C(=O)NC(C(=O)N1C(C=O)CCC1)CCCNC(=[N+H2])N)CCCNC(=[N+H2])N)CCCNC(=[N+H2])N)CCCNC(=[N+H2])N)CCC(=O)N)C([N+H3])CC(=O)[O-],4,D,Kd,570.0,5YGB
-66,6bj3,ligand,ile pro leu thr glu glu ala glu leu,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C1N(C(=O)C([N+H3])C(CC)C)CCC1)CC(C)C)C(O)C)CCC(=O)[O-])CCC(=O)[O-])C)CCC(=O)[O-])CC(C)C,1,C,Kd,17000.0,6P2C
-67,6ccu,ligand,pro his arg val,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C1[N+H2]CCC1)Cc1nc[nH]c1)CCC)C(C)C,1,B,Kd,35200.0,6CCR
-68,6ghj,ligand,phe ala gln,O=C([O-])C(NC(=O)C(NC(=O)C([N+H3])Cc1ccccc1)C)CCC(=O)N,1,B,Kd,6890000.0,4D2B
-69,6hpg,ligand,gly ser lys met glu glu val asp,S(CCC(NC(=O)C(NC(=O)C(NC(=O)C[N+H3])CO)CCCC[N+H3])C(=O)NC(C(=O)NC(C(=O)NC(C(=O)NC(C(=O)[O-])CC(=O)[O-])C(C)C)CCC(=O)[O-])CCC(=O)[O-])C,0,D,Kd,15700.0,6Q3Q
+,pdb_id,type,ligand_id,ligand_smiles,ligand_resid,ligand_chain,affinity_measure,affinity_value,apo95_pdb,,,
+0,1JQ9,ligand,PHE LEU SER TYR LYS,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])Cc1ccccc1)CC(C)C)CO)Cc1ccc(O)cc1)CCCC[N+H3],1,P,Kd,3.57,1CL5,1,,
+1,1LB6,ligand,LYS GLN GLU PRO GLN GLU ILE ASP PHE,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C1N(C(=O)C(NC(=O)C(NC(=O)C([N+H3])CCCC[N+H3])CCC(=O)N)CCC(=O)[O-])CCC1)CCC(=O)N)CCC(=O)[O-])C(CC)C)CC(=O)[O-])Cc1ccccc1,601,B,Kd,84000.0,1LB4,1,,
+2,1MFG,ligand,GLU TYR LEU GLY LEU ASP VAL PRO VAL,O=C([O-])C(NC(=O)C1N(C(=O)C(NC(=O)C(NC(=O)C(NC(=O)CNC(=O)C(NC(=O)C(NC(=O)C([N+H3])CCC(=O)[O-])Cc2ccc(O)cc2)CC(C)C)CC(C)C)CC(=O)[O-])C(C)C)CCC1)C(C)C,1247,B,Kd,50000.0,2H3L,1,,
+3,1OBX,ligand,GLU THR LEU GLU ASP SER VAL PHE,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])CC(=O)[O-])CO)C(C)C)Cc1ccccc1,5,B,Kd,1900.0,1R6J,0,alinhamento do pymol falhou,fora do meu controle
+4,1OXQ,ligand,ALA VAL PRO ILE ALA GLN LYS SER GLU,O=C(NC(C(=O)N1C(C(=O)NC(C=O)C(CC)C)CCC1)C(C)C)C([N+H3])C,1,F,Ki,500.0,1OXN,0,Assembly 1 não consta o peptídeo,limitação da base
+5,1UTC,ligand,THR LEU PRO TRP ASP LEU TRP THR THR,O=C(NC(C(=O)N1C(C(=O)NC(C(=O)NC(C(=O)NC(C(=O)NC(C=O)Cc2c3c([nH]c2)cccc3)CC(C)C)CC(=O)[O-])Cc2c3c([nH]c2)cccc3)CCC1)CC(C)C)C([N+H3])C(O)C,1,P,Kd,28000.0,6QNN,1,,
+6,1W9O,ligand,THR ASN GLU TYR TYR VAL,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])CC(=O)N)CCC(=O)[O-])Cc1ccc(O)cc1)Cc1ccc(O)cc1)C(C)C,2,S,Kd,740000.0,4Z33,0,Assembly 1 não consta o peptídeo,limitação da base
+7,1Y7L,ligand,GLY ILE ASP ASP GLY MET ASN LEU ASN ILE,n/a,264,P,Ki,130.0,5XCN,0,alinhamento do pymol falhou,fora do meu controle
+8,1YWO,ligand,GLN PRO PRO VAL PRO PRO GLN ARG PRO MET,S(CCC(NC(=O)C1N(C(=O)C(NC(=O)C(NC(=O)C2N(C(=O)C3N(C(=O)C(NC(=O)C4N(C(=O)C5N(C(=O)C([N+H3])CCC(=O)N)CCC5)CCC4)C(C)C)CCC3)CCC2)CCC(=O)N)CCCNC(=[N+H2])N)CCC1)C(=O)[O-])C,1,P,Kd,12500.0,1YWP,1,,
+9,2CV3,ligand,THR THR LEU LYS PHE PRO SER ASP TRP ASP ASP,n/a,256,B,ic50,270.0,1FLE,0,complexo proteína-proteína,limitação da base
+10,2HL3,ligand,GLU GLU GLN GLU GLU TYR,O=C([O-])C(NC(=O)C(NC(=O)C([N+H3])CCC(=O)[O-])CCC(=O)[O-])Cc1ccc(O)cc1,266,C,Kd,170.0,2HKQ,0,blast deu proteínas diferentes,fora do meu controle
+11,2O9V,ligand,VAL PRO PRO PRO VAL PRO PRO PRO PRO SER,O=C(C([N+H3])C(C)C)N1C(C(=O)N2C(C(=O)N3C(C(=O)NC(C(=O)N4C(C(=O)N5C(C(=O)N6C(C(=O)N7C(C(=O)NC(C=O)CO)CCC7)CCC6)CCC5)CCC4)C(C)C)CCC3)CCC2)CCC1,45,B,Kd,288000.0,2O2W,1,,
+12,2PEH,ligand,LYS ARG LYS SER ARG TRP ASP GLU THR PRO,O=C(NC(C(=O)NC(C(=O)NC(C(=O)NC(C(=O)NC(C(=O)N1C(C=O)CCC1)C)CCC(=O)[O-])CC(=O)[O-])Cc1c2c([nH]c1)cccc2)CCCNC(=[N+H2])N)C(NC(=O)C(NC(=O)C([N+H3])C)C)CO,333,C,Kd,1100.0,2PE8,1,,
+13,2QL9,ligand,GLN GLY HIS GLY GLU,O=C([O-])C(NC(=O)CNC(=O)C(NC(=O)CNC(=O)C([N+H3])CCC(=O)N)Cc1nc[nH]c1)CCC(=O)[O-],810,G,Ki,0.94,3IBF,1,,
+14,2R3Y,ligand,ASP ASN ARG LEU GLY LEU VAL TYR TRP PHE,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])C(C)C)Cc1ccc(O)cc1)Cc1c2c([nH]c1)cccc2)Cc1ccccc1,407,D,Kd,6500.0,1SOT,1,,
+15,2VJ0,ligand,PHE GLU ASP ASN PHE VAL PRO,O=C(NCC(=O)NC(C(=O)NC(C(=O)NC(C(=O)NC(C(=O)N1C(C=O)CCC1)C(C)C)Cc1ccccc1)CC(=O)N)CC(=O)[O-])C([N+H3])Cc1ccccc1,1,Q,Kd,21000.0,1QTP,1,,
+16,3DIW,ligand,ASN GLN LEU ALA TRP PHE ASP THR ASP LEU,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])CCC(=O)N)CC(C)C)C)Cc1c2c([nH]c1)cccc2)Cc1ccccc1)CC(=O)[O-])C(O)C)CC(=O)[O-])CC(C)C,773,C,Kd,190.0,3DJ3,1,,
+17,3DRG,ligand,ARG PRO PRO GLY PHE SER PRO PHE ALA,O=C(NC(C(=O)N1C(C(=O)NC(C(=O)NC(C=O)C)Cc2ccccc2)CCC1)CO)C(NC(=O)CNC(=O)C1N(C(=O)C2N(C(=O)C([N+H3])CCCNC(=[N+H2])N)CCC2)CCC1)Cc1ccccc1,1,B,Kd,100.0,3FTO,1,grande mudança conformacional,curioso
+18,3F9W,ligand,ALA LYS ARG HIS ARG LYS VAL LEU ARG ASP,O=C(NC(C=O)CC(C)C)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])C)CCCNC(=[N+H2])N)Cc1nc[nH]c1)C)CCCC[N+H3])C(C)C,16,E,Kd,19000.0,5V2N,1,grande mudança conformacional,curioso
+19,3NIM,ligand,ARG ARG ALA ALA,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])CCCNC(=[N+H2])N)CCCNC(=[N+H2])N)C)C,1,X,Kd,17700.0,6KGI,0,alinhamento do pymol falhou,fora do meu controle
+20,3OBU,ligand,PRO GLU PRO THR ALA PRO PRO GLU GLU,O=C([O-])C(NC(=O)C(NC(=O)C1N(C(=O)C2N(C(=O)C(NC(=O)C(NC(=O)C3N(C(=O)C(NC(=O)C4[N+H2]CCC4)CCC(=O)[O-])CCC3)C(O)C)C)CCC2)CCC1)CCC(=O)[O-])CCC(=O)[O-],5,B,Kd,50000.0,3OBS,1,,
+21,4EZW,ligand,ASN ARG LEU LEU LEU THR GLY,O=C(NC(C(=O)NC(C(=O)NC(C(=O)NC(C(=O)NC(C=O)C(O)C)CC(C)C)CC(C)C)CC(C)C)CCCNC(=[N+H2])N)C([N+H3])CC(=O)N,1,E,Kd,1000.0,4JNF,1,,
+22,4HXJ,ligand,ARG GLY THR,O=C([O-])C(NC(=O)CNC(=O)C([N+H3])CCCNC(=[N+H2])N)C(O)C,760,C,Kd,74300.0,5ECA,1,,
+23,4NXQ,ligand,GLU ASN GLN LYS GLU TYR PHE PHE,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])CC(=O)N)CCC(=O)N)CCCC[N+H3])CCC(=O)[O-])Cc1ccc(O)cc1)Cc1ccccc1)Cc1ccccc1,3,E,Kd,18000.0,4NXP,1,,
+24,4NY3,ligand,THR PRO ASP TYR PHE LEU,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C1[N+H2]CCC1)CC(=O)[O-])Cc1ccc(O)cc1)Cc1ccccc1)CC(C)C,305,D,Kd,49500.0,2G62,1,,
+25,4P0A,ligand,THR GLU ASP ASN ASP ASP ASP LEU TYR GLY,O=C(NC(C=O)Cc1ccc(O)cc1)C([N+H3])CC(C)C,803,D,Kd,30300.0,4P09,1,,
+26,4Z0U,ligand,TRP MET ASP PHE ASP ASP ASP ILE PRO PHE,O=C([O-])C(NC(=O)C1N(C(=O)C(NC(=O)C([N+H3])CC(=O)[O-])C(CC)C)CCC1)Cc1ccccc1,174,E,Kd,2000.0,1GOB,1,,
+27,4Z76,ligand,LEU TYR LEU VAL CYS GLY GLU ARG VAL,SCC(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])CC(C)C)Cc1ccc(O)cc1)CC(C)C)C(C)C)C(=O)NCC(=O)NC(C(=O)NC(C(=O)NC(C(=O)[O-])C(C)C)CCCNC(=[N+H2])N)CCC(=O)[O-],1,F,Kd,13600.0,4Z78,0,Assembly 1 não consta o peptídeo,limitação da base
+28,5AEI,ligand,LYS ARG LYS ARG LYS ARG LYS ARG LYS ARG,O=C(NC(C(=O)NC(C(=O)NC(C(=O)NC(C(=O)NC(C=O)CCCC[N+H3])CCCNC(=[N+H2])N)CCCC[N+H3])CCCNC(=[N+H2])N)CCCC[N+H3])C([N+H3])CCCNC(=[N+H2])N,1,F,Kd,1.1,6S9N,1,possível falso positivo,curioso
+29,5E1M,ligand,PRO PRO LYS ARG ILE ALA,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C1N(C(=O)C2[N+H2]CCC2)CCC1)CCCC[N+H3])CCCNC(=[N+H2])N)C(CC)C)C,1,E,Kd,2.8,5E2B,0,Assembly 1 não consta o peptídeo,limitação da base
+30,5E6O,ligand,TRP GLU GLU LEU,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])Cc1c2c([nH]c1)cccc2)CCC(=O)[O-])CCC(=O)[O-])CC(C)C,1,H,Kd,76900.0,5E6N,1,,
+31,5ELQ,ligand,ARG GLU ASP GLN GLU THR ALA VAL,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])CCC(=O)[O-])CC(=O)[O-])CCC(=O)N)CCC(=O)[O-])C(O)C)C)C(C)C,201,P,Kd,2000.0,3QDO,0,alinhamento do pymol falhou,fora do meu controle
+32,5GU4,ligand,ASP ASP MET GLY PHE GLY LEU PHE ASP,O=C(NC(C(=O)NC(C=O)CC(=O)[O-])Cc1ccccc1)C(NC(=O)CNC(=O)C(NC(=O)C[N+H3])Cc1ccccc1)CC(C)C,2,C,Kd,3400.0,1RTC,1,,
+33,5HFF,ligand,THR LYS ASN TYR LYS GLN PHE SER VAL,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])C)CC(=O)N)Cc1ccc(O)cc1)CCCC[N+H3])CCC(=O)N)Cc1ccccc1)CO)C(C)C,2,B,Kd,500.0,5HET,1,,
+34,5JHD,ligand,GLY ILE LEU GLY PHE VAL PHE THR LEU,O=C(NC(C=O)CC(C)C)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)CNC(=O)C(NC(=O)C(NC(=O)C[N+H3])C(CC)C)CC(C)C)Cc1ccccc1)C(C)C)Cc1ccccc1)C(O)C,1,H,Kd,37.0,6VRN,0,Assembly 1 não consta o peptídeo,limitação da base
+35,5LB7,ligand,LEU SER PRO ASP SER PHE LEU ASN ASP,O=C(NC(C(=O)NC(C=O)CC(C)C)Cc1ccccc1)C([N+H3])CO,0,C,Kd,9000.0,5NBT,1,,
+36,5N70,ligand,ALA PHE ARG ILE PRO LEU THR ARG,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C1N(C(=O)C(NC(=O)C(NC(=O)C(NC(=O)C([N+H3])C)Cc2ccccc2)CCCNC(=[N+H2])N)C(CC)C)CCC1)CC(C)C)C(O)C)CCCNC(=[N+H2])N,5,B,Kd,3.0,5N71,0,Assembly 1 não consta o peptídeo,limitação da base
+37,5T8R,ligand,ALA ARG THR LYS GLN THR ALA ARG LYS SER,O=C(NC(C(=O)NC(C(=O)NC(C(=O)NC(C=O)C)C(O)C)C)CCCC[N+H3])C(NC(=O)C(NC(=O)C([N+H3])C)C)C(O)C,1,E,Kd,51000.0,4QF2,1,,
+38,5W7I,ligand,GLY VAL VAL ALA SER GLN PRO ALA ARG VAL,O=C([O-])C(NC(=O)C(NC(=O)C(NC(=O)C1N(C(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C(NC(=O)C[N+H3])C(C)C)C(C)C)C)CO)CCC(=O)N)CCC1)C)C)C(C)C,1,D,Kd,11000.0,5W7J,1,,
+39,5XN3,ligand,ARG GLY ASP ILE ASN ASN ASN VAL,O=C(NC(C(=O)NC(C(=O)NC(C(=O)NC(C=O)C(C)C)CC(=O)N)CC(=O)N)CC(=O)N)C(NC(=O)C(NC(=O)CNC(=O)C([N+H3])CCCNC(=[N+H2])N)CC(=O)[O-])C(CC)C,1,B,Kd,671.0,6JKJ,1,,
+40,5Y24,ligand,GLY MET PRO ARG GLY ALA,S(CCC(NC(=O)C[N+H3])C(=O)N1C(C(=O)NC(C(=O)NCC(=O)NC(C(=O)[O-])C)CCCNC(=[N+H2])N)CCC1)C,1,D,Kd,4.6,6IM4,0,pymol não salvou o arquivo,fora do meu controle
+41,5YGF,ligand,ASP GLN GLY ARG GLY ARG ARG ARG PRO,O=C(NC(C(=O)NCC(=O)NC(C(=O)NCC(=O)NC(C(=O)NC(C(=O)NC(C(=O)N1C(C=O)CCC1)CCCNC(=[N+H2])N)CCCNC(=[N+H2])N)CCCNC(=[N+H2])N)CCCNC(=[N+H2])N)CCC(=O)N)C([N+H3])CC(=O)[O-],4,D,Kd,570.0,5YGB,0,pymol não salvou o arquivo,fora do meu controle
+,,,,,,,,,Total,28,,
