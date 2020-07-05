@@ -108,18 +108,14 @@ def parse_binding_moad(moad_csv_file):
     new_entries = []
     for i, entry in entries.iterrows():
 
-        if entry.pdb_id != "5N70":
-            continue
-        breakpoint()
+        # if entry.pdb_id != "1OBX":
+        #     continue
+        # breakpoint()
 
         pm.reinitialize()
 
-        pm.fetch(entry.pdb_id, type="pdb1")
+        pm.fetch(entry.pdb_id)
         if entry.pdb_id not in pm.get_object_list():
-            continue
-
-        # Restrict to chains named 'A'
-        if "A" not in pm.get_chains():
             continue
 
         # Store the fasta string length
@@ -129,14 +125,14 @@ def parse_binding_moad(moad_csv_file):
         similars = find_similar_chain_ids(entry.pdb_id.upper() + "_A", 95)
         for sim_pdb, sim_chain in similars:
 
-            if sim_pdb != "5N71":
-                continue
-            breakpoint()
+            # if sim_pdb != "1R6J":
+            #     continue
+            # breakpoint()
 
             if sim_pdb == entry.pdb_id.upper():
                 continue
 
-            pm.fetch(sim_pdb, type="pdb1")
+            pm.fetch(sim_pdb)
             if sim_pdb not in pm.get_object_list():
                 continue
 
@@ -163,7 +159,7 @@ def parse_binding_moad(moad_csv_file):
             # Check nearby ligands
             is_apo = True
             model = pm.get_model(
-                f"({sim_pdb} and (organic or inorganic)) within 5 of ({entry.pdb_id} and (bysegi resid {entry.ligand_resid} and chain {entry.ligand_chain}))"
+                f"({sim_pdb} and (organic)) within 5 of ({entry.pdb_id} and (bysegi resid {entry.ligand_resid} and chain {entry.ligand_chain}))"
             )
             resns = set(a.resn for a in model.atom)
             for resn in resns:
