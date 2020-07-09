@@ -122,12 +122,17 @@ def parse_binding_moad(moad_csv_file):
         ref_len = len(pm.get_fastastr(entry.pdb_id))
 
         # Look for similar chains using the Blast clusterization algorithm
+        count_apo = 0
+        apos = set()
         similars = find_similar_chain_ids(entry.pdb_id.upper() + "_A", 95)
         for sim_pdb, sim_chain in similars:
 
             # if sim_pdb != "1R6J":
             #     continue
             # breakpoint()
+
+            if sim_pdb in apos:
+                continue
 
             if sim_pdb == entry.pdb_id.upper():
                 continue
@@ -173,30 +178,27 @@ def parse_binding_moad(moad_csv_file):
                 continue
 
             # Check nearby peptides
-            model = pm.get_model(
-                f"({sim_pdb} and polymer) within 5 of ({entry.pdb_id} and (bysegi resid {entry.ligand_resid} and chain {entry.ligand_chain}))"
-            )
-            is_apo = True
-            for at in model.atom:
-                fasta = pm.get_fastastr(
-                    f"bs. {sim_pdb} and chain {at.chain} and resid {at.resi}"
-                )
-                for j, fast in enumerate(fasta.split("\n>")):
-                    # Peptides have a fasta string smaller than 25 characters
-                    if len(fast) <= 25:
-                        pm.delete(sim_pdb)
-                        is_apo = False
-                        break
-                if not is_apo:
+            tmpsele = pm.get_unused_name("_tmp")
+            pm.select(tmpsele, f"({sim_pdb} and polymer) within 5 of "
+                               f"({entry.pdb_id} and (bysegi resid {entry.ligand_resid} "
+                               f"and chain {entry.ligand_chain}))")
+            for chain in pm.get_chains(tmpsele):
+                if pm.count_atoms(f"guide & bs. ({tmpsele} & chain {chain})") <= 25:
+                    pm.delete(sim_pdb)
+                    is_apo = False
                     break
+            pm.delete(tmpsele)
             if not is_apo:
                 continue
 
             # Found a pair apo/holo
+            apos.add(sim_pdb)
             new_entries.append({**entry, "apo95_pdb": sim_pdb})
             pm.save(f"{entry.pdb_id}.pdb", entry.pdb_id)
             pm.save(f"{sim_pdb}.pdb", sim_pdb)
-            break
+            count_apo += 1
+            if count_apo == 10:
+                break
         else:
             continue
     return pd.DataFrame(new_entries)
