@@ -1,8 +1,8 @@
 import json
 from ftplib import FTP
 from functools import lru_cache
+import requests
 
-from graphqlclient import GraphQLClient
 from pymol import cmd as pm
 
 from ..prefs import PLUGIN_DATA_DIR
@@ -60,9 +60,8 @@ def get_resolution(pdb_id):
     """
     Get the resolution for a PDB id, or None case it doesn't have.
     """
-    client = GraphQLClient(endpoint="https://data.rcsb.org/graphql")
-    data = client.execute(
-        query=f"""
+    ret = requests.post("https://data.rcsb.org/graphql",
+                  json={'query': f"""
     {{
         entry(entry_id: "{pdb_id}") {{
             pdbx_vrpt_summary {{
@@ -70,9 +69,8 @@ def get_resolution(pdb_id):
             }}
       }}
     }}
-    """
-    )
-    data = json.loads(data)
+    """})
+    data = ret.json()
     resol = data["data"]["entry"]["pdbx_vrpt_summary"]["PDB_resolution"]
     return resol
 

@@ -30,7 +30,6 @@ setup(
     packages=find_packages(),
     # TODO remove unused requirements
     install_requires=[
-        "graphqlclient",
         "lxml",
         "pandas",
         "scipy",
