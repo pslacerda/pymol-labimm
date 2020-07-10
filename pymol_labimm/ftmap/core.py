@@ -429,7 +429,6 @@ def get_fractional_overlap(sel1, sel2, radius=2, state1=1, state2=1, verbose=1):
     return fo
 
 
-@pm.extend
 def calculate_kozakov2015(*args, **kwargs):
     """
 Calculate a hotspot following Kozakov et al (2015).
@@ -461,3 +460,4 @@ def init_plugin_cli():
     pm.extend(load_ftmap)
     pm.extend(load_atlas)
     pm.extend(get_fractional_overlap)
+    pm.extend(calculate_kozakov2015)
