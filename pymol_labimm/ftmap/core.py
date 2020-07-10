@@ -15,7 +15,7 @@ from pymol import cmd as pm
 from pymol import stored
 
 from ..commons import (disable_feedback, fractional_overlap, get_atoms,
-                       pairwise, settings)
+                       pairwise, settings, count_molecules)
 
 
 @dataclass
@@ -23,16 +23,16 @@ class Cluster:
     """A consensus site."""
 
     id: str
-    obj_name: str
+    sele: str
     coords: np.ndarray = field(repr=False)
 
     @cached_property
     def selection(self):
-        return self.obj_name
+        return self.sele
 
     @cached_property
     def strength(self):
-        return int(self.obj_name.rsplit(".", 1)[1])
+        return count_molecules(self.sele)
 
     @cached_property
     def max_dist(self):
@@ -346,7 +346,7 @@ def process_session(ensemble_collector, pattern, group, max_size, root=None):
 #
 
 
-def calculate_ftmap_hotspots(path, group=None, max_cs=3):
+def load_ftmap(path, group=None, max_cs=3):
     """
     Load a FTMap PDB file and classify hotspot ensembles in accordance to
     Kozakov et al. (2015).
@@ -387,7 +387,7 @@ def calculate_ftmap_hotspots(path, group=None, max_cs=3):
     return process_session(Kozakov2015Ensemble.collect_ftmap, path, group, int(max_cs))
 
 
-def calculate_atlas_hotspots(path, group=None, max_size=3):
+def load_atlas(path, group=None, max_size=3):
     """
     Load an Atlas PDB file. See `help calculate_ftmap_hotspots`.
     """
@@ -429,7 +429,35 @@ def get_fractional_overlap(sel1, sel2, radius=2, state1=1, state2=1, verbose=1):
     return fo
 
 
+@pm.extend
+def calculate_kozakov2015(*args, **kwargs):
+    """
+Calculate a hotspot following Kozakov et al (2015).
+
+SIGNATURE:
+    calculate_kozakov2015 sel1 ...
+
+EXAMPLES:
+    calculate_kozakov2015 *CS.000_*, *CS.002_*
+    calculate_kozakov2015 *.000_*, *.001_*
+
+    """
+    clusters = []
+    for sel in args:
+        cluster = Cluster('', sel, pm.get_coords(sel))
+        clusters.append(cluster)
+
+    ensemble = Ensemble(clusters)
+    print(f"""
+{ensemble}
+S {ensemble.strength}
+S0 {ensemble.strength0}
+CD {ensemble.max_center_to_center}
+MD {ensemble.max_dist}
+    """)
+
+
 def init_plugin_cli():
-    pm.extend(calculate_ftmap_hotspots)
-    pm.extend(calculate_atlas_hotspots)
+    pm.extend(load_ftmap)
+    pm.extend(load_atlas)
     pm.extend(get_fractional_overlap)

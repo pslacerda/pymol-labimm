@@ -5,7 +5,7 @@ import pymol.gui
 import pymol.Qt
 from pymol import cmd as pm
 
-from .core import calculate_atlas_hotspots, calculate_ftmap_hotspots
+from .core import load_atlas, load_ftmap
 
 QFileDialog = pymol.Qt.QtWidgets.QFileDialog
 QFormLayout = pymol.Qt.QtWidgets.QFormLayout
@@ -43,7 +43,7 @@ class LoadFTMapServerResultDialog(QDialog):
             return
         self.fetch_button.setDisabled(True)
         try:
-            ret = calculate_ftmap_hotspots(result_id)
+            ret = load_ftmap(result_id)
         except Exception as exc:
             self.done(QDialog.Rejected)
             raise Exception("The result cannot be loaded.")
@@ -66,7 +66,7 @@ def init_plugin_gui(menu):
                 menu, "Atlas result file", expanduser("~"), "PDB file (*.pdb)"
             )[0]
         )
-        calculate_atlas_hotspots(atlas_pdb)
+        load_atlas(atlas_pdb)
 
     load_ftmap_pdb_action = menu.addAction("Load FTMap PDB")
 
@@ -77,4 +77,4 @@ def init_plugin_gui(menu):
                 menu, "FTMap result file", expanduser("~"), "PDB file (*.pdb)"
             )[0]
         )
-        calculate_ftmap_hotspots(ftmap_pdb)
+        load_ftmap(ftmap_pdb)

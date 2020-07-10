@@ -101,3 +101,17 @@ def get_atoms(sel, attrs, state=1):
         atoms = pd.concat([atoms, pd.DataFrame(stored.atoms, columns=attrs)], axis=1)
         del stored.atoms
     return atoms
+
+
+def count_molecules(selection="all"):
+    """
+    By Thomas Holder.
+    """
+    tmpsele = pm.get_unused_name("_tmp")
+    count = 0
+    if pm.select(tmpsele, selection):
+        count += 1
+        while pm.select(tmpsele, f'{tmpsele} &! bm. first {tmpsele}'):
+            count += 1
+    pm.delete(tmpsele)
+    return count
