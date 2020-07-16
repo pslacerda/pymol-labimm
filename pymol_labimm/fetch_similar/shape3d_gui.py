@@ -49,7 +49,7 @@ class FetchBlastClusterDialog(QDialog):
         # Form
         self.ref_pdb_line = QLineEdit("", self)
         self.ref_pdb_line.setValidator(
-            QRegExpValidator(QRegExp("[0-9][A-Za-z0-9]{3}"), self)
+            QRegExpValidator(QRegExp("[a-zA-Z0-9]{4}"), self)
         )
         self.layout.addRow("Reference PDB:", self.ref_pdb_line)
 

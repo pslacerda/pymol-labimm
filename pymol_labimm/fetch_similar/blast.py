@@ -43,7 +43,7 @@ def find_similar_chain_ids(chain_id, threshold):
     cluster_fname = f"bc-{threshold}.out"
     with open(PLUGIN_DATA_DIR + "/" + cluster_fname) as cluster_file:
         for cluster in cluster_file:
-            if chain_id in cluster:
+            if chain_id.upper() in cluster.upper():
                 break
         else:
             return []
@@ -51,7 +51,7 @@ def find_similar_chain_ids(chain_id, threshold):
         sim_chain_ids = []
         for chain_id in cluster.split():
             pdb, chain = chain_id.split("_")
-            sim_chain_ids.append((pdb.upper(), chain))
+            sim_chain_ids.append((pdb.upper(), chain.upper()))
         return sim_chain_ids
 
 
@@ -115,6 +115,7 @@ SEE ALSO:
     update_cluster_data
     fetch_similar_shape3d
     """
+    chain_id = chain_id.upper()
     max_structures = int(max_structures)
     obj = f"{chain_id}"
     pm.fetch(chain_id, obj)
