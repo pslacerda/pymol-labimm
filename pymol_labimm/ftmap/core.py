@@ -14,8 +14,14 @@ from pymol import CmdException
 from pymol import cmd as pm
 from pymol import stored
 
-from ..commons import (disable_feedback, fractional_overlap, get_atoms,
-                       pairwise, settings, count_molecules)
+from ..commons import (
+    disable_feedback,
+    fractional_overlap,
+    get_atoms,
+    pairwise,
+    settings,
+    count_molecules,
+)
 
 
 @dataclass
@@ -307,7 +313,7 @@ def process_session(ensemble_collector, pattern, group, max_size, base_root=None
                     obj = f"{root}.{klass}.{i:03}"
                     pm.create(obj, ensemble.selection)
 
-                    if hasattr(pm, 'set_property'):
+                    if hasattr(pm, "set_property"):
                         pm.set_property("Class", ensemble.klass, obj)
                         pm.set_property("S", ensemble.strength, obj)
                         pm.set_property("S (CS0)", ensemble.clusters[0].strength, obj)
@@ -439,9 +445,9 @@ def get_fractional_overlap2(sel1, sel2, radius=2, state1=1, state2=1):
     SEE:
         get_fractional_overlap
     """
-    print(sel1 + ' / ' + sel2)
+    print(sel1 + " / " + sel2)
     get_fractional_overlap(sel1, sel2, radius, state1, state2, 1)
-    print(sel2 + ' / ' + sel1)
+    print(sel2 + " / " + sel1)
     get_fractional_overlap(sel2, sel1, radius, state2, state1, 1)
 
 
@@ -459,41 +465,47 @@ EXAMPLES:
     """
     clusters = []
     for sel in args:
-        cluster = Cluster('', sel, pm.get_coords(sel))
+        cluster = Cluster("", sel, pm.get_coords(sel))
         clusters.append(cluster)
 
     ensemble = Ensemble(clusters)
-    print(f"""
+    print(
+        f"""
 {ensemble}
 S {ensemble.strength}
 S0 {ensemble.strength0}
 CD {ensemble.max_center_to_center}
 MD {ensemble.max_dist}
-    """)
-
-
-def nearby_aminoacids_similarity(sel1, sel2, radius=4, state1=1, state2=1):
     """
-    Compute the similarity of the aminoacids nearby two selections.
+    )
+
+
+def nearby_aminoacids_similarity(sel1, sel2, radius=4, verbose=1):
+    """
+    Compute the overlap coefficient between the aminoacids nearby two selections.
 
     SIGNATURE:
-        nearby_aminoacids_similarity sel1, sel2, [radius=4,] [state1=1,] [state2=1]
+        nearby_aminoacids_similarity sel1, sel2, [radius=4]
 
     OPTIONS:
         sel1    Selection of object 1.
         sel2    Selection of object 2.
         radius  Radius to look for nearby aminoacids.
-        state1  State of object 1.
-        state2  State of object 2.
 
     EXAMPLES:
         nearby_aminoacids_similarity *CS.000_*, *CS.002_*
         nearby_aminoacids_similarity *.000_*, *.001_*
     """
-    resis1 = get_atoms(sel1, ["resi"], state1)
-    resis2 = get_atoms(sel2, ["resi"], state2)
 
+    resis1 = set(get_atoms(f"polymer within {radius} of {sel1}", ["resi"]).resi)
+    resis2 = set(get_atoms(f"polymer within {radius} of {sel2}", ["resi"]).resi)
 
+    overlap = len(resis1.intersection(resis2)) / min(
+        len(resis1), len(resis2)
+    )
+    if verbose:
+        print('Overlap coefficient =', overlap)
+    return overlap
 
 
 def init_plugin_cli():
