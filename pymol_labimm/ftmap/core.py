@@ -261,14 +261,16 @@ class Kozakov2015Ensemble(Ensemble):
         )
 
 
-def process_session(ensemble_collector, pattern, group, max_size, root=None):
+def process_session(ensemble_collector, pattern, group, max_size, base_root=None):
     """Main plugin code."""
 
     results = {}
 
     for path in sorted(glob(pattern)):
-        if root is None:
+        if base_root is None:
             root = pm.get_legal_name(splitext(basename(path))[0])
+        else:
+            root = base_root
         results[root] = [], []
         ensembles, clusters = results[root]
 
@@ -305,11 +307,12 @@ def process_session(ensemble_collector, pattern, group, max_size, root=None):
                     obj = f"{root}.{klass}.{i:03}"
                     pm.create(obj, ensemble.selection)
 
-                    pm.set_property("Class", ensemble.klass, obj)
-                    pm.set_property("S", ensemble.strength, obj)
-                    pm.set_property("S (CS0)", ensemble.clusters[0].strength, obj)
-                    pm.set_property("CD", ensemble.max_center_to_center, obj)
-                    pm.set_property("MD", ensemble.max_dist, obj)
+                    if hasattr(pm, 'set_property'):
+                        pm.set_property("Class", ensemble.klass, obj)
+                        pm.set_property("S", ensemble.strength, obj)
+                        pm.set_property("S (CS0)", ensemble.clusters[0].strength, obj)
+                        pm.set_property("CD", ensemble.max_center_to_center, obj)
+                        pm.set_property("MD", ensemble.max_dist, obj)
 
                     ensemble.selection = obj
                     ensembles.append(ensemble)
@@ -429,6 +432,19 @@ def get_fractional_overlap(sel1, sel2, radius=2, state1=1, state2=1, verbose=1):
     return fo
 
 
+def get_fractional_overlap2(sel1, sel2, radius=2, state1=1, state2=1):
+    """
+    Compute the fractional overlap.
+
+    SEE:
+        get_fractional_overlap
+    """
+    print(sel1 + ' / ' + sel2)
+    get_fractional_overlap(sel1, sel2, radius, state1, state2, 1)
+    print(sel2 + ' / ' + sel1)
+    get_fractional_overlap(sel2, sel1, radius, state2, state1, 1)
+
+
 def calculate_kozakov2015(*args, **kwargs):
     """
 Calculate a hotspot following Kozakov et al (2015).
@@ -456,8 +472,34 @@ MD {ensemble.max_dist}
     """)
 
 
+def nearby_aminoacids_similarity(sel1, sel2, radius=4, state1=1, state2=1):
+    """
+    Compute the similarity of the aminoacids nearby two selections.
+
+    SIGNATURE:
+        nearby_aminoacids_similarity sel1, sel2, [radius=4,] [state1=1,] [state2=1]
+
+    OPTIONS:
+        sel1    Selection of object 1.
+        sel2    Selection of object 2.
+        radius  Radius to look for nearby aminoacids.
+        state1  State of object 1.
+        state2  State of object 2.
+
+    EXAMPLES:
+        nearby_aminoacids_similarity *CS.000_*, *CS.002_*
+        nearby_aminoacids_similarity *.000_*, *.001_*
+    """
+    resis1 = get_atoms(sel1, ["resi"], state1)
+    resis2 = get_atoms(sel2, ["resi"], state2)
+
+
+
+
 def init_plugin_cli():
     pm.extend(load_ftmap)
     pm.extend(load_atlas)
     pm.extend(get_fractional_overlap)
+    pm.extend(get_fractional_overlap2)
     pm.extend(calculate_kozakov2015)
+    pm.extend(nearby_aminoacids_similarity)
