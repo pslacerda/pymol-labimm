@@ -494,16 +494,20 @@ def nearby_aminoacids_similarity(sel1, sel2, radius=4, verbose=1):
 
     EXAMPLES:
         nearby_aminoacids_similarity *CS.000_*, *CS.002_*
-        nearby_aminoacids_similarity *.000_*, *.001_*
+        nearby_aminoacids_similarity *D.001*, *D.002*
     """
+    atoms1 = get_atoms(f"polymer within {radius} of ({sel1})", ["chain", "resi"])
+    atoms2 = get_atoms(f"polymer within {radius} of ({sel2})", ["chain", "resi"])
 
-    resis1 = set(get_atoms(f"polymer within {radius} of {sel1}", ["resi"]).resi)
-    resis2 = set(get_atoms(f"polymer within {radius} of {sel2}", ["resi"]).resi)
+    resis1 = set(zip(atoms1.chain, atoms1.resi))
+    resis2 = set(zip(atoms2.chain, atoms2.resi))
 
     overlap = len(resis1.intersection(resis2)) / min(
         len(resis1), len(resis2)
     )
     if verbose:
+        print('Sel1:', ', '.join(['%s%s' % r for r in resis1]))
+        print('Sel2:', ', '.join(['%s%s' % r for r in resis2]))
         print('Overlap coefficient =', overlap)
     return overlap
 
