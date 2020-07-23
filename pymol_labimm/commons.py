@@ -111,7 +111,7 @@ def count_molecules(selection="all"):
     count = 0
     if pm.select(tmpsele, selection):
         count += 1
-        while pm.select(tmpsele, f'{tmpsele} &! bm. first {tmpsele}'):
+        while pm.select(tmpsele, f"{tmpsele} &! bm. first {tmpsele}"):
             count += 1
     pm.delete(tmpsele)
     return count
