@@ -1,6 +1,7 @@
 import fnmatch
 import shutil
 import tempfile
+import textwrap
 from dataclasses import dataclass, field
 from glob import glob
 from itertools import combinations
@@ -14,8 +15,8 @@ from pymol import CmdException
 from pymol import cmd as pm
 from pymol import stored
 
-from ..commons import (count_molecules, disable_feedback, fractional_overlap,
-                       get_atoms, pairwise, settings)
+from ..commons import (count_molecules, disable_feedback, get_atoms, pairwise,
+                       settings)
 
 
 @dataclass
@@ -38,40 +39,41 @@ class Cluster:
     def max_dist(self):
         return scipy.spatial.distance_matrix(self.coords, self.coords).max()
 
-    @cached_property
-    def polar_count(self):
-        stored.resns = []
-        pm.iterate_state(0, self.selection, "stored.resns.append(resn)")
-        count = 0
-        for resn in stored.resns:
-            if resn in [
-                "ACD",
-                "ACN",
-                "ACT",
-                "ADY",
-                "AMN",
-                "BDY",
-                "BUT",
-                "DFO",
-                "EOL",
-                "PHN",
-                "THS",
-                "URE",
-            ]:
-                count += 1
-        del stored.resns
-        return count
-
-    @cached_property
-    def apolar_count(self):
-        stored.resns = []
-        pm.iterate_state(0, self.selection, "stored.resns.append(resn)")
-        count = 0
-        for resn in stored.resns:
-            if resn in ["BEN", "CHX", "DME", "ETH"]:
-                count += 1
-        del stored.resns
-        return count
+    # @cached_property
+    # def polar_count(self):
+    #     stored.resns = []
+    #     pm.iterate_state(0, self.selection, "stored.resns.append(resn)")
+    #     count = 0
+    #     for resn in stored.resns:
+    #         if resn in [
+    #             "ACD",
+    #             "ACN",
+    #             "ACT",
+    #             "ADY",
+    #             "AMN",
+    #             "BDY",
+    #             "BUT",
+    #             "DFO",
+    #             "EOL",
+    #             "PHN",
+    #             "THS",
+    #             "URE",
+    #         ]:
+    #             count += 1
+    #     del stored.resns
+    #     return count
+    #
+    # @cached_property
+    # def apolar_count(self):
+    #     get_atoms()
+    #     stored.resns = []
+    #     pm.iterate_state(0, self.selection, "stored.resns.append(resn)")
+    #     count = 0
+    #     for resn in stored.resns:
+    #         if resn in ["BEN", "CHX", "DME", "ETH"]:
+    #             count += 1
+    #     del stored.resns
+    #     return count
 
     def __hash__(self):
         return hash(self.selection)
@@ -349,6 +351,7 @@ def process_session(ensemble_collector, pattern, group, max_size, base_root=None
 #
 
 
+@pm.extend
 def load_ftmap(path, group=None, max_cs=3):
     """
     Load a FTMap PDB file and classify hotspot ensembles in accordance to
@@ -385,11 +388,12 @@ def load_ftmap(path, group=None, max_cs=3):
             temp,
             group,
             int(max_cs),
-            root="fftmap" + path,
+            base_root="fftmap" + path,
         )
     return process_session(Kozakov2015Ensemble.collect_ftmap, path, group, int(max_cs))
 
 
+@pm.extend
 def load_atlas(path, group=None, max_size=3):
     """
     Load an Atlas PDB file. See `help calculate_ftmap_hotspots`.
@@ -399,57 +403,12 @@ def load_atlas(path, group=None, max_size=3):
     )
 
 
-def get_fractional_overlap(sel1, sel2, radius=2, state1=1, state2=1, verbose=1):
-    """
-    Compute the fractional overlap of ligand (A) respective to a hotspot
-    ensemble (B).
-        FO = Nc/Nt
-    Nc is the number of atoms of A in contact with B. Nt is the number of atoms
-    of A.
-
-    Hydrogen atoms are ignored.
-
-    If the contact radius is 0 then the VdW radii will be used.
-
-    The states are for select a single state from a multi-state objects.
-
-    OPTIONS:
-        sel1    ligand object.
-        sel2    hotspot object.
-        radius  the radius so two atoms are in contact (default: 2).
-        state1  state of sel1.
-        state2  state of sel2.
-
-    EXAMPLES:
-        get_fractional_overlap ref_lig, ftmap1234.D.003
-        get_fractional_overlap ref_lig, ftmap1234.CS.000_016
-    """
-    atoms1 = get_atoms(sel1, ["coords", "elem", "vdw"], state1)
-    atoms2 = get_atoms(sel2, ["coords", "elem", "vdw"], state2)
-    fo = fractional_overlap(atoms1, atoms2, int(radius) or None)
-    if bool(verbose):
-        print(f"  Fractional Overlap = {fo}")
-    return fo
-
-
-def get_fractional_overlap2(sel1, sel2, radius=2, state1=1, state2=1):
-    """
-    Compute the fractional overlap.
-
-    SEE:
-        get_fractional_overlap
-    """
-    print(sel1 + " / " + sel2)
-    get_fractional_overlap(sel1, sel2, radius, state1, state2, 1)
-    print(sel2 + " / " + sel1)
-    get_fractional_overlap(sel2, sel1, radius, state2, state1, 1)
-
-
+@pm.extend
 def calculate_kozakov2015(*args, **kwargs):
     """
 Calculate a hotspot following Kozakov et al (2015).
 
-SIGNATURE:
+USAGE:
     calculate_kozakov2015 sel1 ...
 
 EXAMPLES:
@@ -464,52 +423,13 @@ EXAMPLES:
 
     ensemble = Ensemble(clusters)
     print(
-        f"""
-{ensemble}
-S {ensemble.strength}
-S0 {ensemble.strength0}
-CD {ensemble.max_center_to_center}
-MD {ensemble.max_dist}
-    """
+        textwrap.dedent(
+            f"""
+        {ensemble}
+        S {ensemble.strength}
+        S0 {ensemble.strength0}
+        CD {ensemble.max_center_to_center}
+        MD {ensemble.max_dist}
+        """
+        )
     )
-
-
-def nearby_aminoacids_similarity(sel1, sel2, radius=4, verbose=1):
-    """
-    Compute the overlap coefficient between the aminoacids nearby two selections.
-
-    SIGNATURE:
-        nearby_aminoacids_similarity sel1, sel2, [radius=4]
-
-    OPTIONS:
-        sel1    Selection of object 1.
-        sel2    Selection of object 2.
-        radius  Radius to look for nearby aminoacids.
-
-    EXAMPLES:
-        nearby_aminoacids_similarity *CS.000_*, *CS.002_*
-        nearby_aminoacids_similarity *D.001*, *D.002*
-    """
-    atoms1 = get_atoms(f"polymer within {radius} of ({sel1})", ["chain", "resi"])
-    atoms2 = get_atoms(f"polymer within {radius} of ({sel2})", ["chain", "resi"])
-
-    resis1 = set(zip(atoms1.chain, atoms1.resi))
-    resis2 = set(zip(atoms2.chain, atoms2.resi))
-
-    overlap = len(resis1.intersection(resis2)) / min(
-        len(resis1), len(resis2)
-    )
-    if verbose:
-        print('Sel1:', ', '.join(['%s%s' % r for r in resis1]))
-        print('Sel2:', ', '.join(['%s%s' % r for r in resis2]))
-        print('Overlap coefficient =', overlap)
-    return overlap
-
-
-def init_plugin_cli():
-    pm.extend(load_ftmap)
-    pm.extend(load_atlas)
-    pm.extend(get_fractional_overlap)
-    pm.extend(get_fractional_overlap2)
-    pm.extend(calculate_kozakov2015)
-    pm.extend(nearby_aminoacids_similarity)

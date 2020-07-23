@@ -75,17 +75,6 @@ def contact_matrix(a, b, radius=None):
         return (d - radius) <= 0
 
 
-def fractional_overlap(a, b, radius=None):
-    """Compute the fractional overlap of a respective to b."""
-    a = a[a["elem"] != "H"]
-    b = b[b["elem"] != "H"]
-    contacts = np.any(contact_matrix(a, b, radius), axis=1)
-    num_contacts = np.sum(contacts)
-    total_atoms = len(a)
-    fo = num_contacts / total_atoms
-    return fo
-
-
 def get_atoms(sel, attrs, state=1):
     """Get the atoms and attributes of a selection."""
     coords = None
@@ -115,3 +104,93 @@ def count_molecules(selection="all"):
             count += 1
     pm.delete(tmpsele)
     return count
+
+
+#
+# Commands
+#
+
+
+@pm.extend
+def get_fractional_overlap(sel1, sel2, radius=2, state1=1, state2=1, verbose=1):
+    """
+    Compute the fractional overlap of sel1 respective to sel2.
+        FO = Nc/Nt
+
+    Nc is the number of atoms of sel1 in contact with sel2. Nt is the number of atoms
+    of sel1.
+
+    Hydrogen atoms are ignored.
+
+    If the contact radius is 0 then the VdW radii will be used.
+
+    The states are for select a single state from a multi-state objects.
+
+    OPTIONS:
+        sel1    ligand object.
+        sel2    hotspot object.
+        radius  the radius so two atoms are in contact (default: 2).
+        state1  state of sel1.
+        state2  state of sel2.
+
+    EXAMPLES:
+        get_fractional_overlap ref_lig, ftmap1234.D.003
+        get_fractional_overlap ref_lig, ftmap1234.CS.000_016
+    """
+    atoms1 = get_atoms(sel1, ["coords", "elem", "vdw"], state1)
+    atoms2 = get_atoms(sel2, ["coords", "elem", "vdw"], state2)
+
+    a = atoms1[atoms1["elem"] != "H"]
+    b = atoms2[atoms2["elem"] != "H"]
+    contacts = np.any(contact_matrix(a, b, radius), axis=1)
+    num_contacts = np.sum(contacts)
+    total_atoms = len(a)
+    fo = num_contacts / total_atoms
+    if bool(verbose):
+        print(f"  Fractional Overlap = {fo}")
+    return fo
+
+
+@pm.extend
+def get_fractional_overlap2(sel1, sel2, radius=2, state1=1, state2=1):
+    """
+    Compute the fractional overlap.
+
+    SEE:
+        get_fractional_overlap
+    """
+    print(sel1 + " / " + sel2)
+    get_fractional_overlap(sel1, sel2, radius, state1, state2, 1)
+    print(sel2 + " / " + sel1)
+    get_fractional_overlap(sel2, sel1, radius, state2, state1, 1)
+
+
+@pm.extend
+def nearby_aminoacids_similarity(sel1, sel2, radius=4, verbose=1):
+    """
+    Compute the overlap coefficient between the aminoacids nearby two selections.
+
+    USAGE:
+        nearby_aminoacids_similarity sel1, sel2, [radius=4]
+
+    OPTIONS:
+        sel1    Selection of object 1.
+        sel2    Selection of object 2.
+        radius  Radius to look for nearby aminoacids.
+
+    EXAMPLES:
+        nearby_aminoacids_similarity *CS.000_*, *CS.002_*
+        nearby_aminoacids_similarity *D.001*, *D.002*
+    """
+    atoms1 = get_atoms(f"polymer within {radius} of ({sel1})", ["chain", "resi"])
+    atoms2 = get_atoms(f"polymer within {radius} of ({sel2})", ["chain", "resi"])
+
+    resis1 = set(zip(atoms1.chain, atoms1.resi))
+    resis2 = set(zip(atoms2.chain, atoms2.resi))
+
+    overlap = len(resis1.intersection(resis2)) / min(len(resis1), len(resis2))
+    if verbose:
+        print("Sel1:", ", ".join(["%s%s" % r for r in resis1]))
+        print("Sel2:", ", ".join(["%s%s" % r for r in resis2]))
+        print("Overlap coefficient =", overlap)
+    return overlap
