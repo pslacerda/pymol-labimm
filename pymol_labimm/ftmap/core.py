@@ -19,8 +19,14 @@ import seaborn as sb
 
 sb.set(font_scale=1)
 
-from ..commons import (count_molecules, disable_feedback, get_atoms, pairwise,
-                       settings, nearby_aminoacids_similarity)
+from ..commons import (
+    count_molecules,
+    disable_feedback,
+    get_atoms,
+    pairwise,
+    settings,
+    nearby_aminoacids_similarity,
+)
 
 
 @dataclass
@@ -267,7 +273,14 @@ class Kozakov2015Ensemble(Ensemble):
         )
 
 
-def process_session(ensemble_collector, pattern, group, max_size, plot=False, base_root=None):
+def process_session(
+    ensemble_collector,
+    pattern,
+    group,
+    max_size,
+    plot,
+    base_root=None,
+):
     """Main plugin code."""
 
     results = {}
@@ -350,18 +363,31 @@ def process_session(ensemble_collector, pattern, group, max_size, plot=False, ba
 
     if plot:
 
-        matrix = []
+        roots = []
         labels = []
-        for root1 in sorted(results):
-            for i, ensemble1 in enumerate(results[root1][0]):
-                matrix.append([])
-                labels.append(ensemble1.selection)
-                for root2 in sorted(results):
-                    for j, ensemble2 in enumerate(results[root2][0]):
-                        sim = nearby_aminoacids_similarity(ensemble1.selection, ensemble2.selection, verbose=False)
-                        matrix[i].append(sim)
 
-        sb.heatmap(matrix, xticklabels=labels, yticklabels=labels, annot=True, cmap="YlGnBu")
+        for root in sorted(results):
+            for ensemble in results[root][0]:
+                roots.append(root)
+                labels.append(ensemble.selection)
+
+        matrix = np.zeros((len(labels), len(labels)))
+        for i, (root1, selection1) in enumerate(zip(roots, labels)):
+            for j, (root2, selection2) in enumerate(zip(roots, labels)):
+                matrix[i][j] = nearby_aminoacids_similarity(
+                    selection1,
+                    selection2,
+                    polymer1=root1 + '.protein',
+                    polymer2=root2 + '.protein',
+                    verbose=False,
+                )
+
+        sb.heatmap(
+            matrix,
+            vmax=1,
+            vmin=0,
+            xticklabels=labels, yticklabels=labels, annot=True, cmap="YlGnBu"
+        )
         plt.show()
     return results
 
@@ -372,7 +398,9 @@ def process_session(ensemble_collector, pattern, group, max_size, plot=False, ba
 
 
 @pm.extend
-def load_ftmap(path, group=None, max_cs=3, plot=True):
+def load_ftmap(
+    path, group=None, max_cs=3, plot=True,
+):
     """
     Load a FTMap PDB file and classify hotspot ensembles in accordance to
     Kozakov et al. (2015).
@@ -408,18 +436,31 @@ def load_ftmap(path, group=None, max_cs=3, plot=True):
             temp,
             group,
             int(max_cs),
+            plot=plot,
             base_root="fftmap" + path,
         )
-    return process_session(Kozakov2015Ensemble.collect_ftmap, path, group, int(max_cs), plot)
+    return process_session(
+        Kozakov2015Ensemble.collect_ftmap,
+        path,
+        group,
+        int(max_cs),
+        plot=plot,
+    )
 
 
 @pm.extend
-def load_atlas(path, group=None, max_size=3, plot=False):
+def load_atlas(
+    path, group=None, max_size=3, plot=True,
+):
     """
     Load an Atlas PDB file. See `help calculate_ftmap_hotspots`.
     """
     return process_session(
-        Kozakov2015Ensemble.collect_atlas, path, group, int(max_size), plot
+        Kozakov2015Ensemble.collect_atlas,
+        path,
+        group,
+        int(max_size),
+        plot=plot,
     )
 
 
@@ -429,7 +470,7 @@ def calculate_kozakov2015(*args, **kwargs):
 Calculate a hotspot following Kozakov et al (2015).
 
 USAGE:
-    calculate_kozakov2015 sel1 ...
+    calculate_kozakov2015 sel1, ...
 
 EXAMPLES:
     calculate_kozakov2015 *CS.000_*, *CS.002_*
@@ -441,11 +482,12 @@ EXAMPLES:
         cluster = Cluster("", sel, pm.get_coords(sel))
         clusters.append(cluster)
 
-    ensemble = Ensemble(clusters)
+    ensemble = Kozakov2015Ensemble(clusters)
     print(
         textwrap.dedent(
             f"""
         {ensemble}
+        Class {ensemble.klass}
         S {ensemble.strength}
         S0 {ensemble.strength0}
         CD {ensemble.max_center_to_center}

@@ -37,6 +37,6 @@ setup(
         "cached_property",
         "patool",
         "matplotlib",
-        "seaborn"
+        "seaborn",
     ],
 )
