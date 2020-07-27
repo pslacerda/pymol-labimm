@@ -14,9 +14,13 @@ from cached_property import cached_property
 from pymol import CmdException
 from pymol import cmd as pm
 from pymol import stored
+import matplotlib.pyplot as plt
+import seaborn as sb
+
+sb.set(font_scale=1)
 
 from ..commons import (count_molecules, disable_feedback, get_atoms, pairwise,
-                       settings)
+                       settings, nearby_aminoacids_similarity)
 
 
 @dataclass
@@ -263,7 +267,7 @@ class Kozakov2015Ensemble(Ensemble):
         )
 
 
-def process_session(ensemble_collector, pattern, group, max_size, base_root=None):
+def process_session(ensemble_collector, pattern, group, max_size, plot=False, base_root=None):
     """Main plugin code."""
 
     results = {}
@@ -343,6 +347,22 @@ def process_session(ensemble_collector, pattern, group, max_size, base_root=None
         pm.hide("nb_spheres", "*label")
 
         pm.orient(root)
+
+    if plot:
+
+        matrix = []
+        labels = []
+        for root1 in sorted(results):
+            for i, ensemble1 in enumerate(results[root1][0]):
+                matrix.append([])
+                labels.append(ensemble1.selection)
+                for root2 in sorted(results):
+                    for j, ensemble2 in enumerate(results[root2][0]):
+                        sim = nearby_aminoacids_similarity(ensemble1.selection, ensemble2.selection, verbose=False)
+                        matrix[i].append(sim)
+
+        sb.heatmap(matrix, xticklabels=labels, yticklabels=labels, annot=True, cmap="YlGnBu")
+        plt.show()
     return results
 
 
@@ -352,7 +372,7 @@ def process_session(ensemble_collector, pattern, group, max_size, base_root=None
 
 
 @pm.extend
-def load_ftmap(path, group=None, max_cs=3):
+def load_ftmap(path, group=None, max_cs=3, plot=True):
     """
     Load a FTMap PDB file and classify hotspot ensembles in accordance to
     Kozakov et al. (2015).
@@ -390,16 +410,16 @@ def load_ftmap(path, group=None, max_cs=3):
             int(max_cs),
             base_root="fftmap" + path,
         )
-    return process_session(Kozakov2015Ensemble.collect_ftmap, path, group, int(max_cs))
+    return process_session(Kozakov2015Ensemble.collect_ftmap, path, group, int(max_cs), plot)
 
 
 @pm.extend
-def load_atlas(path, group=None, max_size=3):
+def load_atlas(path, group=None, max_size=3, plot=False):
     """
     Load an Atlas PDB file. See `help calculate_ftmap_hotspots`.
     """
     return process_session(
-        Kozakov2015Ensemble.collect_atlas, path, group, int(max_size)
+        Kozakov2015Ensemble.collect_atlas, path, group, int(max_size), plot
     )
 
 

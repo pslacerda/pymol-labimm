@@ -166,24 +166,23 @@ def get_fractional_overlap2(sel1, sel2, radius=2, state1=1, state2=1):
 
 
 @pm.extend
-def nearby_aminoacids_similarity(sel1, sel2, radius=4, verbose=1):
+def nearby_aminoacids_similarity(sel1, sel2, polymer1='polymer', polymer2='polymer', radius=4, verbose=1):
     """
-    Compute the overlap coefficient between the aminoacids nearby two selections.
+    Compute the overlap coefficient between the aminoacids ids nearby two selections.
 
-    USAGE:
-        nearby_aminoacids_similarity sel1, sel2, [radius=4]
+    OPTIONS
+        sel1        Selection of object 1.
+        sel2        Selection of object 2.
+        radius      Radius to look for nearbyt aminoacids.
+        polymer1    sel1 protein selection.
+        polymer2    sel2 protein selection.
 
-    OPTIONS:
-        sel1    Selection of object 1.
-        sel2    Selection of object 2.
-        radius  Radius to look for nearby aminoacids.
-
-    EXAMPLES:
-        nearby_aminoacids_similarity *CS.000_*, *CS.002_*
-        nearby_aminoacids_similarity *D.001*, *D.002*
+    EXAMPLES
+        nearby_aminoacids_similarity *CS.000_*, *CS.002_*, radius=4
+        nearby_aminoacids_similarity *D.001*, *D.002*, polymer1='obj1', polymer2='obj2'
     """
-    atoms1 = get_atoms(f"polymer within {radius} of ({sel1})", ["chain", "resi"])
-    atoms2 = get_atoms(f"polymer within {radius} of ({sel2})", ["chain", "resi"])
+    atoms1 = get_atoms(f"(polymer and ({polymer1})) within {radius} of ({sel1})", ["chain", "resi"])
+    atoms2 = get_atoms(f"(polymer and ({polymer2})) within {radius} of ({sel2})", ["chain", "resi"])
 
     resis1 = set(zip(atoms1.chain, atoms1.resi))
     resis2 = set(zip(atoms2.chain, atoms2.resi))
