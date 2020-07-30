@@ -61,20 +61,16 @@ def init_plugin_gui(menu):
 
     @load_atlas_pdb_action.triggered.connect
     def triggered():
-        atlas_pdb = str(
-            QFileDialog.getOpenFileName(
-                menu, "Atlas result file", expanduser("~"), "PDB file (*.pdb)"
-            )[0]
-        )
-        load_atlas(atlas_pdb)
+        atlas_pdb = QFileDialog.getOpenFileNames(
+            menu, "Atlas result file", expanduser("~"), "PDB file (*.pdb)"
+        )[0]
+        load_atlas(*atlas_pdb)
 
     load_ftmap_pdb_action = menu.addAction("Load FTMap PDB")
 
     @load_ftmap_pdb_action.triggered.connect
     def triggered():
-        ftmap_pdb = str(
-            QFileDialog.getOpenFileName(
-                menu, "FTMap result file", expanduser("~"), "PDB file (*.pdb)"
-            )[0]
-        )
-        load_ftmap(ftmap_pdb)
+        ftmap_pdb = QFileDialog.getOpenFileNames(
+            menu, "FTMap result file", expanduser("~"), "PDB file (*.pdb)"
+        )[0]
+        load_ftmap(*ftmap_pdb)

@@ -17,7 +17,7 @@ from pymol import stored
 import matplotlib.pyplot as plt
 import seaborn as sb
 
-sb.set(font_scale=1)
+sb.set(font_scale=0.5)
 
 from ..commons import (
     count_molecules,
@@ -275,110 +275,117 @@ class Kozakov2015Ensemble(Ensemble):
 
 def process_session(
     ensemble_collector,
-    pattern,
+    patterns,
     group,
     max_size,
     plot,
+    plot_annot,
+    plot_class,
     base_root=None,
 ):
     """Main plugin code."""
 
     results = {}
+    for pattern in sorted(patterns):
+        for path in glob(pattern):
+            if base_root is None:
+                root = pm.get_legal_name(splitext(basename(path))[0])
+            else:
+                root = base_root
+            results[root] = [], []
+            ensembles, clusters = results[root]
 
-    for path in sorted(glob(pattern)):
-        if base_root is None:
-            root = pm.get_legal_name(splitext(basename(path))[0])
-        else:
-            root = base_root
-        results[root] = [], []
-        ensembles, clusters = results[root]
+            if group:
+                root = f"{group}.{root}"
+            else:
+                root = root
 
-        if group:
-            root = f"{group}.{root}"
-        else:
-            root = root
+            with disable_feedback("all", "warnings"):
+                with settings(group_auto_mode=1):
+                    pm.load(path)
 
-        with disable_feedback("all", "warnings"):
-            with settings(group_auto_mode=1):
-                pm.load(path)
+            try:
+                collected_ensembles = list(ensemble_collector(max_size))
+                if len(collected_ensembles) == 0:
+                    raise Exception("No ensembles found.")
+            except:
+                raise CmdException(f"File {path} is invalid.")
 
-        try:
-            collected_ensembles = list(ensemble_collector(max_size))
-            if len(collected_ensembles) == 0:
-                raise Exception()
-        except:
-            raise CmdException(f"File {path} is invalid.")
+            with settings(group_auto_mode=2):
+                pm.create(f"{root}.protein", "protein")
+                pm.delete("protein")
 
-        with settings(group_auto_mode=2):
-            pm.create(f"{root}.protein", "protein")
-            pm.delete("protein")
+                i = 0
 
-            i = 0
+                for ensemble in collected_ensembles:
+                    klass = ensemble.klass
+                    if klass:
+                        i += 1
+                        pm.hide("sticks", ensemble.selection)
+                        pm.show("line", ensemble.selection)
+                        pm.util.cbas(ensemble.selection)
 
-            for ensemble in collected_ensembles:
-                klass = ensemble.klass
-                if klass:
-                    i += 1
-                    pm.hide("sticks", ensemble.selection)
-                    pm.show("line", ensemble.selection)
-                    pm.util.cbas(ensemble.selection)
+                        obj = f"{root}.{klass}.{i:03}"
+                        pm.create(obj, ensemble.selection)
 
-                    obj = f"{root}.{klass}.{i:03}"
-                    pm.create(obj, ensemble.selection)
+                        if hasattr(pm, "set_property"):
+                            pm.set_property("Class", ensemble.klass, obj)
+                            pm.set_property("S", ensemble.strength, obj)
+                            pm.set_property(
+                                "S (CS0)", ensemble.clusters[0].strength, obj
+                            )
+                            pm.set_property("CD", ensemble.max_center_to_center, obj)
+                            pm.set_property("MD", ensemble.max_dist, obj)
 
-                    if hasattr(pm, "set_property"):
-                        pm.set_property("Class", ensemble.klass, obj)
-                        pm.set_property("S", ensemble.strength, obj)
-                        pm.set_property("S (CS0)", ensemble.clusters[0].strength, obj)
-                        pm.set_property("CD", ensemble.max_center_to_center, obj)
-                        pm.set_property("MD", ensemble.max_dist, obj)
+                        ensemble.selection = obj
+                        ensembles.append(ensemble)
 
-                    ensemble.selection = obj
-                    ensembles.append(ensemble)
+                for i, cluster in enumerate(Cluster.collect_atlas()):
+                    pm.hide("sticks", cluster.selection)
+                    pm.show("line", cluster.selection)
+                    pm.util.cbay(cluster.selection)
+                    obj = f"{root}.CS.{i:03}_{cluster.strength:03}"
+                    pm.create(obj, cluster.selection)
+                    pm.delete(cluster.selection)
+                    cluster.selection = obj
+                    clusters.append(cluster)
 
-            for i, cluster in enumerate(Cluster.collect_atlas()):
-                pm.hide("sticks", cluster.selection)
-                pm.show("line", cluster.selection)
-                pm.util.cbay(cluster.selection)
-                obj = f"{root}.CS.{i:03}_{cluster.strength:03}"
-                pm.create(obj, cluster.selection)
-                pm.delete(cluster.selection)
-                cluster.selection = obj
-                clusters.append(cluster)
+            pm.color("yellow", f"{root}.CS.*")
+            pm.color("salmon", f"{root}.B.* or {root}.Bs.* {root}.Bl.*")
+            pm.color("red", f"{root}.D.* or {root}.Ds.* {root}.Dl.*")
 
-        pm.color("yellow", f"{root}.CS.*")
-        pm.color("salmon", f"{root}.B.* or {root}.Bs.* {root}.Bl.*")
-        pm.color("red", f"{root}.D.* or {root}.Ds.* {root}.Dl.*")
+            pm.hide("lines", f"{root}.*")
+            pm.disable(f"{root}.CS")
 
-        pm.hide("lines", f"{root}.*")
-        pm.disable(f"{root}.CS")
+            pm.show("mesh", f"{root}.B.* or {root}.Bs.* {root}.Bl.*")
+            pm.show("mesh", f"{root}.D.* or {root}.Ds.* {root}.Dl.*")
 
-        pm.show("mesh", f"{root}.B.* or {root}.Bs.* {root}.Bl.*")
-        pm.show("mesh", f"{root}.D.* or {root}.Ds.* {root}.Dl.*")
+            pm.show("mesh", f"{root}.CS.*")
+            pm.hide("nb_spheres", "*label")
 
-        pm.show("mesh", f"{root}.CS.*")
-        pm.hide("nb_spheres", "*label")
-
-        pm.orient(root)
+            pm.orient(root)
 
     if plot:
 
         roots = []
-        labels = []
+        selections = []
 
         for root in sorted(results):
             for ensemble in results[root][0]:
                 roots.append(root)
-                labels.append(ensemble.selection)
+                selections.append(ensemble.selection)
 
-        matrix = np.zeros((len(labels), len(labels)))
-        for i, (root1, selection1) in enumerate(zip(roots, labels)):
-            for j, (root2, selection2) in enumerate(zip(roots, labels)):
+        if plot_class:
+            selections = [s for s in selections if "." + plot_class + "." in s]
+
+        matrix = np.zeros((len(selections), len(selections)))
+        for i, (root1, selection1) in enumerate(zip(roots, selections)):
+            for j, (root2, selection2) in enumerate(zip(roots, selections)):
                 matrix[i][j] = nearby_aminoacids_similarity(
                     selection1,
                     selection2,
-                    polymer1=root1 + '.protein',
-                    polymer2=root2 + '.protein',
+                    polymer1=root1 + ".protein",
+                    polymer2=root2 + ".protein",
                     verbose=False,
                 )
 
@@ -386,7 +393,10 @@ def process_session(
             matrix,
             vmax=1,
             vmin=0,
-            xticklabels=labels, yticklabels=labels, annot=True, cmap="YlGnBu"
+            xticklabels=selections,
+            yticklabels=selections,
+            annot=plot_annot,
+            cmap="YlGnBu",
         )
         plt.show()
     return results
@@ -399,7 +409,7 @@ def process_session(
 
 @pm.extend
 def load_ftmap(
-    path, group=None, max_cs=3, plot=True,
+    *paths, group=None, max_cs=3, plot=True, plot_annot=True, plot_class=None, _self=pm,
 ):
     """
     Load a FTMap PDB file and classify hotspot ensembles in accordance to
@@ -410,57 +420,73 @@ def load_ftmap(
         path    PDB file path, glob or server result id.
         group   optional group name to put objects in.
         max_cs  the maximum number of consensus sites to consider.
+        plot    plot similarity matrix.
+        plot_annot remove numbers on similarity matrix.
+        plot_class filter to show only a specific hotspot class.
 
     EXAMPLES:
         load_ftmap fftmap.1234.pdb
-        load_ftmap fftmap.1234.pdb, GRP, 4
-        load_ftmap 79781
+        load_ftmap fftmap.1111.pdb, fftmap.2222.pdb, group=GRP, max_cs=4
+        load_ftmap fftmap_*.pdb, plot_annot=0, plot_class=D
     """
-    if all(ch in "1234567890" for ch in path):
+    if all(ch in "1234567890" for ch in paths[0]):
+        jobid = paths[0]
         fp, temp = tempfile.mkstemp(suffix=".pdb")
         open(fp).close()
         session = requests.Session()
         session.get("https://ftmap.bu.edu/nousername.php")
         with session.get(
             f"https://ftmap.bu.edu/file.php"
-            f"?jobid={path}"
+            f"?jobid={jobid}"
             f"&coeffi=0&model=0&filetype=model_file",
             stream=True,
         ) as ret:
             with open(temp, "wb") as fp:
                 shutil.copyfileobj(ret.raw, fp)
             if not ret.content:
-                raise CmdException(f"Invalid response id {path}")
+                raise CmdException(f"Invalid response id {jobid}")
         return process_session(
             Kozakov2015Ensemble.collect_ftmap,
-            temp,
+            [temp],
             group,
             int(max_cs),
             plot=plot,
-            base_root="fftmap" + path,
+            plot_annot=bool(int(plot_annot)),
+            plot_class=plot_class,
+            base_root="fftmap" + jobid,
         )
     return process_session(
         Kozakov2015Ensemble.collect_ftmap,
-        path,
+        paths,
         group,
         int(max_cs),
         plot=plot,
+        plot_annot=bool(int(plot_annot)),
+        plot_class=plot_class,
     )
 
 
 @pm.extend
 def load_atlas(
-    path, group=None, max_size=3, plot=True,
+    *paths,
+    group=None,
+    max_size=3,
+    plot=True,
+    plot_annot=True,
+    plot_class=None,
+    _self=pm,
 ):
     """
-    Load an Atlas PDB file. See `help calculate_ftmap_hotspots`.
+    Load an Atlas PDB file. See `help load_ftmap`.
     """
     return process_session(
         Kozakov2015Ensemble.collect_atlas,
-        path,
+        paths,
         group,
         int(max_size),
         plot=plot,
+        plot_annot=bool(int(plot_annot)),
+        plot_class=plot_class,
     )
 
 

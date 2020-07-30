@@ -176,8 +176,8 @@ def nearby_aminoacids_similarity(
         sel1        Selection of object 1.
         sel2        Selection of object 2.
         radius      Radius to look for nearbyt aminoacids.
-        polymer1    sel1 protein selection.
-        polymer2    sel2 protein selection.
+        polymer1    protein of sel1.
+        polymer2    protein of sel2.
 
     EXAMPLES
         nearby_aminoacids_similarity *CS.000_*, *CS.002_*, radius=4
