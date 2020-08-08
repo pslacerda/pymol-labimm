@@ -98,7 +98,7 @@ reference chain.
 On the first use update the database with the command `update_cluster_data`.
 Update the database weekly.
 
-OPTIONS:
+OPTIONS
     chain_id        Reference structure chain id.
     similarity      Sequence similarity threshold (one of the available
                     from RCSB PDB).
@@ -111,18 +111,17 @@ OPTIONS:
     max_resolution  Fetch only X-ray structures with up to such
                     resolution.
     max_structures  Fetch at most n structures. 0 for all structures.
-EXAMPLES:
+EXAMPLES
     fetch_similar_blast 2XY9_A, 100
     fetch_similar_blast 2XY9_A, 95, 3ES, 3, organic
     fetch_similar_blast 6Y2F_A, max_structures=0
-SEE ALSO:
+SEE ALSO
     update_cluster_data
     fetch_similar_shape3d
     """
     chain_id = chain_id.upper()
     max_structures = int(max_structures)
-    obj = f"{chain_id}"
-    pm.fetch(chain_id, obj)
+    pm.fetch(chain_id, chain_id)
 
     sims = []
     similars = find_similar_chain_ids(chain_id, similarity)
@@ -132,12 +131,12 @@ SEE ALSO:
         if max_structures != 0 and cont >= max_structures:
             break
 
-        if sim_chain.upper() == chain_id.upper():
+        sim_obj = f"{sim_pdb}_{sim_chain}"
+        if sim_obj.upper() == chain_id.upper():
             continue
 
-        sim_obj = f"{sim_pdb}_{sim_chain}"
         pm.fetch(sim_obj, **{"async": 0})
-        pm.align(sim_obj, obj)
+        pm.align(sim_obj, chain_id)
 
         # Check the resolution
         resol = None
@@ -152,7 +151,7 @@ SEE ALSO:
             model = pm.get_model(
                 f"({sim_obj} and ({compounds}))"
                 f" within {dist} of"
-                f"({obj} and (resn {ligand}))"
+                f"({chain_id} and (resn {ligand}))"
             )
             resns = set(a.resn for a in model.atom)
 

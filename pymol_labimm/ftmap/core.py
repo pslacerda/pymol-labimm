@@ -7,26 +7,21 @@ from glob import glob
 from itertools import combinations
 from os.path import basename, splitext
 
+import matplotlib.pyplot as plt
 import numpy as np
 import requests
 import scipy.spatial
+import seaborn as sb
 from cached_property import cached_property
 from pymol import CmdException
 from pymol import cmd as pm
 from pymol import stored
-import matplotlib.pyplot as plt
-import seaborn as sb
+
+from ..commons import (count_molecules, disable_feedback, get_atoms,
+                       nearby_aminoacids_similarity, pairwise, settings)
 
 sb.set(font_scale=0.5)
 
-from ..commons import (
-    count_molecules,
-    disable_feedback,
-    get_atoms,
-    pairwise,
-    settings,
-    nearby_aminoacids_similarity,
-)
 
 
 @dataclass
@@ -416,7 +411,7 @@ def load_ftmap(
     Kozakov et al. (2015).
     https://doi.org/10.1021/acs.jmedchem.5b00586
 
-    OPTIONS:
+    OPTIONS
         path    PDB file path, glob or server result id.
         group   optional group name to put objects in.
         max_cs  the maximum number of consensus sites to consider.
@@ -424,7 +419,7 @@ def load_ftmap(
         plot_annot remove numbers on similarity matrix.
         plot_class filter to show only a specific hotspot class.
 
-    EXAMPLES:
+    EXAMPLES
         load_ftmap fftmap.1234.pdb
         load_ftmap fftmap.1111.pdb, fftmap.2222.pdb, group=GRP, max_cs=4
         load_ftmap fftmap_*.pdb, plot_annot=0, plot_class=D
@@ -495,10 +490,10 @@ def calculate_kozakov2015(*args, **kwargs):
     """
 Calculate a hotspot following Kozakov et al (2015).
 
-USAGE:
+USAGE
     calculate_kozakov2015 sel1, ...
 
-EXAMPLES:
+EXAMPLES
     calculate_kozakov2015 *CS.000_*, *CS.002_*
     calculate_kozakov2015 *.000_*, *.001_*
 
@@ -512,12 +507,12 @@ EXAMPLES:
     print(
         textwrap.dedent(
             f"""
-        {ensemble}
-        Class {ensemble.klass}
-        S {ensemble.strength}
-        S0 {ensemble.strength0}
-        CD {ensemble.max_center_to_center}
-        MD {ensemble.max_dist}
+                {ensemble}
+                Class {ensemble.klass}
+                S {ensemble.strength}
+                S0 {ensemble.strength0}
+                CD {ensemble.max_center_to_center}
+                MD {ensemble.max_dist}
         """
         )
     )
