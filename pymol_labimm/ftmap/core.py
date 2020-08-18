@@ -425,7 +425,7 @@ def process_session(
         """
         )
 
-        _, path = tempfile.mkstemp()
+        _, path = tempfile.mkstemp(suffix='.html')
         with open(path, "w") as fd:
             fd.write(tmpl.render(results=results))
         webbrowser.open(path)
