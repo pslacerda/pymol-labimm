@@ -2,6 +2,7 @@ import fnmatch
 import shutil
 import tempfile
 import textwrap
+import webbrowser
 from dataclasses import dataclass, field
 from glob import glob
 from itertools import combinations
@@ -13,6 +14,7 @@ import requests
 import scipy.spatial
 import seaborn as sb
 from cached_property import cached_property
+from jinja2 import Template
 from pymol import CmdException
 from pymol import cmd as pm
 from pymol import stored
@@ -21,7 +23,6 @@ from ..commons import (count_molecules, disable_feedback, get_atoms,
                        nearby_aminoacids_similarity, pairwise, settings)
 
 sb.set(font_scale=0.5)
-
 
 
 @dataclass
@@ -276,6 +277,7 @@ def process_session(
     plot,
     plot_annot,
     plot_class,
+    table,
     base_root=None,
 ):
     """Main plugin code."""
@@ -394,6 +396,31 @@ def process_session(
             cmap="YlGnBu",
         )
         plt.show()
+
+    if table:
+        tmpl = Template(
+            """
+            <table>
+                {% for root in results %}
+                    {% for e in results[root][0] %}
+                        <tr>
+                            <td>{{ e.selection }}</td>
+                            <td>{{ e.strength }}</td>
+                            <td>{{ e.strength0 }}</td>
+                            <td>{{ e.max_center_to_center }}</td>
+                            <td>{{ e.max_dist }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            </table>
+        """
+        )
+
+        _, path = tempfile.mkstemp()
+        with open(path, "w") as fd:
+            fd.write(tmpl.render(results=results))
+        webbrowser.open(path)
+
     return results
 
 
@@ -404,7 +431,14 @@ def process_session(
 
 @pm.extend
 def load_ftmap(
-    *paths, group=None, max_cs=3, plot=True, plot_annot=True, plot_class=None, _self=pm,
+    *paths,
+    group=None,
+    max_cs=3,
+    plot=True,
+    plot_annot=True,
+    plot_class=None,
+    table=True,
+    _self=pm,
 ):
     """
     Load a FTMap PDB file and classify hotspot ensembles in accordance to
@@ -448,6 +482,7 @@ def load_ftmap(
             plot=plot,
             plot_annot=bool(int(plot_annot)),
             plot_class=plot_class,
+            table=table,
             base_root="fftmap" + jobid,
         )
     return process_session(
@@ -458,6 +493,7 @@ def load_ftmap(
         plot=plot,
         plot_annot=bool(int(plot_annot)),
         plot_class=plot_class,
+        table=table,
     )
 
 
@@ -469,6 +505,7 @@ def load_atlas(
     plot=True,
     plot_annot=True,
     plot_class=None,
+    table=True,
     _self=pm,
 ):
     """
@@ -482,6 +519,7 @@ def load_atlas(
         plot=plot,
         plot_annot=bool(int(plot_annot)),
         plot_class=plot_class,
+        table=table,
     )
 
 
