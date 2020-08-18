@@ -15,8 +15,8 @@ def pip(args):
 
 try:
     from pymol_labimm import init_plugin
-except ImportError:
-    proc, out, err = pip(["install", "pymol-labimm"])
+except:
+    proc, out, err = pip(["install", "--upgrade", "pymol-labimm"])
     if out:
         print(out)
     if err:
