@@ -403,6 +403,13 @@ def process_session(
         tmpl = Template(
             """
             <table>
+                <tr>
+                    <th>Selection</th>
+                    <th>S</th>
+                    <th>S0</th>
+                    <th>CD</th>
+                    <th>MD</th>
+                </tr>
                 {% for root in results %}
                     {% for e in results[root][0] %}
                         <tr>
