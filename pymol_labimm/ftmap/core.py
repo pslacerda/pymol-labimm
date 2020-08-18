@@ -278,6 +278,7 @@ def process_session(
     plot_annot,
     plot_class,
     table,
+    similarity_method,
     base_root=None,
 ):
     """Main plugin code."""
@@ -383,6 +384,7 @@ def process_session(
                     selection2,
                     polymer1=root1 + ".protein",
                     polymer2=root2 + ".protein",
+                    method=similarity_method,
                     verbose=False,
                 )
 
@@ -438,6 +440,7 @@ def load_ftmap(
     plot_annot=True,
     plot_class=None,
     table=True,
+    similarity_method="overlap",
     _self=pm,
 ):
     """
@@ -452,6 +455,7 @@ def load_ftmap(
         plot    plot similarity matrix.
         plot_annot remove numbers on similarity matrix.
         plot_class filter to show only a specific hotspot class.
+        similarity_method method passed to nearby_aminoacids_similarity
 
     EXAMPLES
         load_ftmap fftmap.1234.pdb
@@ -483,6 +487,7 @@ def load_ftmap(
             plot_annot=bool(int(plot_annot)),
             plot_class=plot_class,
             table=table,
+            similarity_method=similarity_method,
             base_root="fftmap" + jobid,
         )
     return process_session(
@@ -494,6 +499,7 @@ def load_ftmap(
         plot_annot=bool(int(plot_annot)),
         plot_class=plot_class,
         table=table,
+        similarity_method=similarity_method,
     )
 
 
@@ -506,6 +512,7 @@ def load_atlas(
     plot_annot=True,
     plot_class=None,
     table=True,
+    similarity_method="overlap",
     _self=pm,
 ):
     """
@@ -520,6 +527,7 @@ def load_atlas(
         plot_annot=bool(int(plot_annot)),
         plot_class=plot_class,
         table=table,
+        similarity_method=similarity_method,
     )
 
 

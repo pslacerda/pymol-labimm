@@ -167,7 +167,13 @@ def get_fractional_overlap2(sel1, sel2, radius=2, state1=1, state2=1):
 
 @pm.extend
 def nearby_aminoacids_similarity(
-    sel1, sel2, polymer1="polymer", polymer2="polymer", radius=4, verbose=1
+    sel1,
+    sel2,
+    polymer1="polymer",
+    polymer2="polymer",
+    radius=4,
+    method="overlap",
+    verbose=1,
 ):
     """
     Compute the overlap coefficient between the aminoacids ids nearby two selections.
@@ -175,13 +181,15 @@ def nearby_aminoacids_similarity(
     OPTIONS
         sel1        Selection of object 1.
         sel2        Selection of object 2.
-        radius      Radius to look for nearbyt aminoacids.
         polymer1    protein of sel1.
         polymer2    protein of sel2.
+        radius      Radius to look for nearbyt aminoacids.
+        method      'overlap' or 'sorensen–dice'
 
     EXAMPLES
         nearby_aminoacids_similarity *CS.000_*, *CS.002_*, radius=4
         nearby_aminoacids_similarity *D.001*, *D.002*, polymer1='obj1', polymer2='obj2'
+        nearby_aminoacids_similarity 6y84.Bs.001, 6y84.B.004, method=sorensen-dice
     """
     atoms1 = get_atoms(
         f"(polymer and ({polymer1})) within {radius} of ({sel1})", ["chain", "resi"]
@@ -190,12 +198,17 @@ def nearby_aminoacids_similarity(
         f"(polymer and ({polymer2})) within {radius} of ({sel2})", ["chain", "resi"]
     )
 
-    resis1 = set(zip(atoms1.chain, atoms1.resi))
-    resis2 = set(zip(atoms2.chain, atoms2.resi))
+    resis1 = set(zip(atoms1.resi, atoms1.chain))
+    resis2 = set(zip(atoms2.resi, atoms2.chain))
 
-    overlap = len(resis1.intersection(resis2)) / min(len(resis1), len(resis2))
+    if method == "overlap":
+        coef = len(resis1.intersection(resis2)) / min(len(resis1), len(resis2))
+    elif method == "sorensen-dice":
+        coef = 2 * len(resis1.intersection(resis2)) / (len(resis1) + len(resis2))
+    else:
+        raise Exception("Not supported method.")
     if verbose:
         print("Sel1:", ", ".join(["%s%s" % r for r in resis1]))
         print("Sel2:", ", ".join(["%s%s" % r for r in resis2]))
-        print("Overlap coefficient =", overlap)
-    return overlap
+        print("Similarity coefficient =", coef)
+    return coef
