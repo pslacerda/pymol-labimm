@@ -183,7 +183,7 @@ def nearby_aminoacids_similarity(
         sel2        Selection of object 2.
         polymer1    protein of sel1.
         polymer2    protein of sel2.
-        radius      Radius to look for nearbyt aminoacids.
+        radius      Radius to look for nearby aminoacids.
         method      'overlap' or 'sorensen–dice'
 
     EXAMPLES
