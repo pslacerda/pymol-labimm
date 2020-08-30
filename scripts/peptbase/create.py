@@ -7,9 +7,10 @@ import pandas as pd
 import requests_cache
 from pymol import cmd as pm
 
-requests_cache.install_cache("requests_cache")
+from pymol_labimm.fetch_similar.blast import (find_similar_chain_ids,
+                                              get_resolution)
 
-from pymol_labimm.fetch_similar.blast import find_similar_chain_ids, get_resolution
+requests_cache.install_cache("requests_cache")
 
 
 def convert_unit(value, unit):
@@ -60,7 +61,7 @@ def parse_binding_moad(moad_csv_file):
                 ligand_smiles = parts[9]
                 entry = {
                     "type": "ligand",
-                    "pdb_id": pdb_id,
+                    "pdb_id": pdb_id.upper(),
                     "ligand_id": ligand_id,
                     "ligand_smiles": ligand_smiles,
                     "ligand_resid": resid,
@@ -101,11 +102,10 @@ def parse_binding_moad(moad_csv_file):
     entries = entries[entries.pdb_id.isin(counts[counts > 0].index)]
     entries = entries.groupby(["pdb_id"]).first().reset_index()
 
-
     #
     # Find apo/holo pairs
     #
-    new_entries = []
+    df = pd.DataFrame()
     for i, entry in entries.iterrows():
 
         # if entry.pdb_id != "1OBX":
@@ -118,8 +118,12 @@ def parse_binding_moad(moad_csv_file):
         if entry.pdb_id not in pm.get_object_list():
             continue
 
-        # Store the fasta string length
-        ref_len = len(pm.get_fastastr(entry.pdb_id))
+        # # Store the fasta string length
+        # ref_len = len(pm.get_fastastr(entry.pdb_id))
+
+        # Holo without apo
+        df = df.append(entry, ignore_index=True)
+        pm.save(f"{entry.pdb_id}.pdb", entry.pdb_id)
 
         # Look for similar chains using the Blast clusterization algorithm
         count_apo = 0
@@ -134,20 +138,20 @@ def parse_binding_moad(moad_csv_file):
             if sim_pdb in apos:
                 continue
 
-            if sim_pdb == entry.pdb_id.upper():
+            if sim_pdb == entry.pdb_id:
                 continue
 
             pm.fetch(sim_pdb)
             if sim_pdb not in pm.get_object_list():
                 continue
 
-            # Remove structures with different number of aminoacids. I'm
-            # considering that peptides impact less than 50 characters on
-            # the fasta string.
-            cur_len = len(pm.get_fastastr(sim_pdb))
-            if abs(ref_len - cur_len) >= 50:
-                pm.delete(sim_pdb)
-                continue
+            # # Remove structures with different number of aminoacids. I'm
+            # # considering that peptides impact less than 50 characters on
+            # # the fasta string.
+            # cur_len = len(pm.get_fastastr(sim_pdb))
+            # if abs(ref_len - cur_len) >= 50:
+            #     pm.delete(sim_pdb)
+            #     continue
 
             # Remove alternative conformations, which may be useful for docking.
             pm.remove('not (alt "" or alt A)')
@@ -159,7 +163,7 @@ def parse_binding_moad(moad_csv_file):
                 continue
 
             # Align the chains
-            pm.align(sim_pdb, entry.pdb_id)
+            pm.align(sim_pdb + " and chain A", entry.pdb_id + " and chain A")
 
             # Check nearby ligands
             is_apo = True
@@ -179,9 +183,12 @@ def parse_binding_moad(moad_csv_file):
 
             # Check nearby peptides
             tmpsele = pm.get_unused_name("_tmp")
-            pm.select(tmpsele, f"({sim_pdb} and polymer) within 5 of "
-                               f"({entry.pdb_id} and (bysegi resid {entry.ligand_resid} "
-                               f"and chain {entry.ligand_chain}))")
+            pm.select(
+                tmpsele,
+                f"({sim_pdb} and polymer) within 5 of "
+                f"({entry.pdb_id} and (bysegi resid {entry.ligand_resid} "
+                f"and chain {entry.ligand_chain}))",
+            )
             for chain in pm.get_chains(tmpsele):
                 if pm.count_atoms(f"guide & bs. ({tmpsele} & chain {chain})") <= 25:
                     pm.delete(sim_pdb)
@@ -193,15 +200,15 @@ def parse_binding_moad(moad_csv_file):
 
             # Found a pair apo/holo
             apos.add(sim_pdb)
-            new_entries.append({**entry, "apo95_pdb": sim_pdb})
-            pm.save(f"{entry.pdb_id}.pdb", entry.pdb_id)
+            df = df.append({**entry, "apo95_pdb_id": sim_pdb}, ignore_index=True)
             pm.save(f"{sim_pdb}.pdb", sim_pdb)
+
             count_apo += 1
-            if count_apo == 10:
+            if count_apo == 1:
                 break
         else:
             continue
-    return pd.DataFrame(new_entries)
+    return df
 
 
 #
