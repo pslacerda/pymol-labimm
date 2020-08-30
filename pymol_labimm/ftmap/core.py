@@ -516,6 +516,7 @@ def process_session(
             vmin=0,
             yticklabels=selections,
             xticklabels=selections,
+            annot=plot_annot,
             cmap="YlGnBu",
             ax=ax[1],
         )
