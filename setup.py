@@ -10,7 +10,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="pymol-labimm",
-    version="0.9.2",
+    version="0.10.0",
     description="Some PyMOL utilities",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -38,6 +38,6 @@ setup(
         "patool",
         "matplotlib",
         "seaborn",
-        "jinja2"
+        "jinja2",
     ],
 )
