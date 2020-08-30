@@ -20,7 +20,8 @@ from pymol import cmd as pm
 from pymol import stored
 
 from ..commons import (count_molecules, disable_feedback, get_atoms,
-                       nearby_aminoacids_similarity, pairwise, settings)
+                       get_fractional_overlap, nearby_aminoacids_similarity,
+                       pairwise, settings)
 
 sb.set(font_scale=0.5)
 
@@ -269,6 +270,111 @@ class Kozakov2015Ensemble(Ensemble):
         )
 
 
+@pm.extend
+def load_ftmap(
+    *paths,
+    group=None,
+    max_cs=3,
+    plot=True,
+    plot_annot=True,
+    plot_class=None,
+    plot_method="overlap",
+    table=True,
+    _self=pm,
+):
+    """
+    Load a FTMap PDB file and classify hotspot ensembles in accordance to
+    Kozakov et al. (2015).
+    https://doi.org/10.1021/acs.jmedchem.5b00586
+
+    OPTIONS
+        path    PDB file path, glob or server result id.
+        group   optional group name to put objects in.
+        max_cs  the maximum number of consensus sites to consider.
+        plot    plot similarity matrix.
+        plot_annot  remove numbers on similarity matrix.
+        plot_class  filter to show only a specific hotspot class.
+        plot_method see `help nearby_aminoacids_similarity`.
+
+    EXAMPLES
+        load_ftmap fftmap.1234.pdb
+        load_ftmap fftmap.1111.pdb, fftmap.2222.pdb, group=GRP, max_cs=4
+        load_ftmap fftmap_*.pdb, plot_annot=0, plot_class=D
+    """
+    if all(ch in "1234567890" for ch in paths[0]):
+        jobid = paths[0]
+        fp, temp = tempfile.mkstemp(suffix=".pdb")
+        open(fp).close()
+        session = requests.Session()
+        session.get("https://ftmap.bu.edu/nousername.php")
+        with session.get(
+            f"https://ftmap.bu.edu/file.php"
+            f"?jobid={jobid}"
+            f"&coeffi=0&model=0&filetype=model_file",
+            stream=True,
+        ) as ret:
+            with open(temp, "wb") as fp:
+                shutil.copyfileobj(ret.raw, fp)
+            if not ret.content:
+                raise CmdException(f"Invalid response id {jobid}")
+        return process_session(
+            Kozakov2015Ensemble.collect_ftmap,
+            [temp],
+            group,
+            int(max_cs),
+            plot=plot,
+            plot_annot=bool(int(plot_annot)),
+            plot_class=plot_class,
+            table=table,
+            plot_method=plot_method,
+            base_root="fftmap" + jobid,
+        )
+    return process_session(
+        Kozakov2015Ensemble.collect_ftmap,
+        paths,
+        group,
+        int(max_cs),
+        plot=plot,
+        plot_annot=bool(int(plot_annot)),
+        plot_class=plot_class,
+        table=table,
+        plot_method=plot_method,
+    )
+
+
+#
+# Plugin commands
+#
+
+
+@pm.extend
+def load_atlas(
+    *paths,
+    group=None,
+    max_size=3,
+    plot=True,
+    plot_annot=True,
+    plot_class=None,
+    plot_method="overlap",
+    table=True,
+    _self=pm,
+):
+    """
+    Load an Atlas PDB file. See `help load_ftmap`.
+    """
+    return process_session(
+        Kozakov2015Ensemble.collect_atlas,
+        paths,
+        group,
+        int(max_size),
+        plot=plot,
+        plot_annot=bool(int(plot_annot)),
+        plot_class=plot_class,
+        table=table,
+        plot_method=plot_method,
+    )
+
+
 def process_session(
     ensemble_collector,
     patterns,
@@ -277,8 +383,8 @@ def process_session(
     plot,
     plot_annot,
     plot_class,
+    plot_method,
     table,
-    similarity_method,
     base_root=None,
 ):
     """Main plugin code."""
@@ -376,27 +482,47 @@ def process_session(
         if plot_class:
             selections = [s for s in selections if "." + plot_class + "." in s]
 
-        matrix = np.zeros((len(selections), len(selections)))
+        matrix_sim = np.zeros((len(selections), len(selections)))
+        matrix_over = np.zeros((len(selections), len(selections)))
         for i, (root1, selection1) in enumerate(zip(roots, selections)):
             for j, (root2, selection2) in enumerate(zip(roots, selections)):
-                matrix[i][j] = nearby_aminoacids_similarity(
+                matrix_sim[i][j] = nearby_aminoacids_similarity(
                     selection1,
                     selection2,
                     polymer1=root1 + ".protein",
                     polymer2=root2 + ".protein",
-                    method=similarity_method,
+                    method=plot_method,
                     verbose=False,
                 )
+                matrix_over[i][j] = get_fractional_overlap(
+                    selection1, selection2, verbose=0
+                )
+
+        fig, ax = plt.subplots(1, 2)
 
         sb.heatmap(
-            matrix,
+            matrix_sim,
             vmax=1,
             vmin=0,
             xticklabels=selections,
             yticklabels=selections,
             annot=plot_annot,
             cmap="YlGnBu",
+            ax=ax[0],
         )
+        sb.heatmap(
+            matrix_over,
+            vmax=1,
+            vmin=0,
+            yticklabels=selections,
+            xticklabels=selections,
+            cmap="YlGnBu",
+            ax=ax[1],
+        )
+        ax[0].set_title(plot_method + " coefficient")
+        ax[0].set_xticklabels(selections, rotation=45, ha="right")
+        ax[1].set_title("fractional overlap")
+        ax[1].set_xticklabels(selections, rotation=45, ha="right")
         plt.show()
 
     if table:
@@ -404,7 +530,8 @@ def process_session(
             """
             <table>
                 <tr>
-                    <th>Selection</th>
+                    <th>Object</th>
+                    <th>Class</th>
                     <th>S</th>
                     <th>S0</th>
                     <th>CD</th>
@@ -414,10 +541,11 @@ def process_session(
                     {% for e in results[root][0] %}
                         <tr>
                             <td>{{ e.selection }}</td>
+                            <td>{{ e.klass }}</td>
                             <td>{{ e.strength }}</td>
                             <td>{{ e.strength0 }}</td>
-                            <td>{{ e.max_center_to_center }}</td>
-                            <td>{{ e.max_dist }}</td>
+                            <td>{{ e.max_center_to_center | round(2) }}</td>
+                            <td>{{ e.max_dist | round(2) }}</td>
                         </tr>
                     {% endfor %}
                 {% endfor %}
@@ -425,117 +553,12 @@ def process_session(
         """
         )
 
-        _, path = tempfile.mkstemp(suffix='.html')
+        _, path = tempfile.mkstemp(suffix=".html")
         with open(path, "w") as fd:
             fd.write(tmpl.render(results=results))
         webbrowser.open(path)
 
     return results
-
-
-#
-# Plugin commands
-#
-
-
-@pm.extend
-def load_ftmap(
-    *paths,
-    group=None,
-    max_cs=3,
-    plot=True,
-    plot_annot=True,
-    plot_class=None,
-    table=True,
-    similarity_method="overlap",
-    _self=pm,
-):
-    """
-    Load a FTMap PDB file and classify hotspot ensembles in accordance to
-    Kozakov et al. (2015).
-    https://doi.org/10.1021/acs.jmedchem.5b00586
-
-    OPTIONS
-        path    PDB file path, glob or server result id.
-        group   optional group name to put objects in.
-        max_cs  the maximum number of consensus sites to consider.
-        plot    plot similarity matrix.
-        plot_annot remove numbers on similarity matrix.
-        plot_class filter to show only a specific hotspot class.
-        similarity_method method passed to nearby_aminoacids_similarity
-
-    EXAMPLES
-        load_ftmap fftmap.1234.pdb
-        load_ftmap fftmap.1111.pdb, fftmap.2222.pdb, group=GRP, max_cs=4
-        load_ftmap fftmap_*.pdb, plot_annot=0, plot_class=D
-    """
-    if all(ch in "1234567890" for ch in paths[0]):
-        jobid = paths[0]
-        fp, temp = tempfile.mkstemp(suffix=".pdb")
-        open(fp).close()
-        session = requests.Session()
-        session.get("https://ftmap.bu.edu/nousername.php")
-        with session.get(
-            f"https://ftmap.bu.edu/file.php"
-            f"?jobid={jobid}"
-            f"&coeffi=0&model=0&filetype=model_file",
-            stream=True,
-        ) as ret:
-            with open(temp, "wb") as fp:
-                shutil.copyfileobj(ret.raw, fp)
-            if not ret.content:
-                raise CmdException(f"Invalid response id {jobid}")
-        return process_session(
-            Kozakov2015Ensemble.collect_ftmap,
-            [temp],
-            group,
-            int(max_cs),
-            plot=plot,
-            plot_annot=bool(int(plot_annot)),
-            plot_class=plot_class,
-            table=table,
-            similarity_method=similarity_method,
-            base_root="fftmap" + jobid,
-        )
-    return process_session(
-        Kozakov2015Ensemble.collect_ftmap,
-        paths,
-        group,
-        int(max_cs),
-        plot=plot,
-        plot_annot=bool(int(plot_annot)),
-        plot_class=plot_class,
-        table=table,
-        similarity_method=similarity_method,
-    )
-
-
-@pm.extend
-def load_atlas(
-    *paths,
-    group=None,
-    max_size=3,
-    plot=True,
-    plot_annot=True,
-    plot_class=None,
-    table=True,
-    similarity_method="overlap",
-    _self=pm,
-):
-    """
-    Load an Atlas PDB file. See `help load_ftmap`.
-    """
-    return process_session(
-        Kozakov2015Ensemble.collect_atlas,
-        paths,
-        group,
-        int(max_size),
-        plot=plot,
-        plot_annot=bool(int(plot_annot)),
-        plot_class=plot_class,
-        table=table,
-        similarity_method=similarity_method,
-    )
 
 
 @pm.extend
