@@ -7,6 +7,8 @@ import pandas as pd
 import scipy.spatial
 from pymol import cmd as pm
 from pymol import stored
+import seaborn as sb
+from matplotlib import pyplot as plt
 
 #
 # Generic
@@ -212,3 +214,26 @@ def nearby_aminoacids_similarity(
         print("Sel2:", ", ".join(["%s%s" % r for r in resis2]))
         print("Similarity coefficient =", coef)
     return coef
+
+
+@pm.extend
+def rms_per_residue(sel1, sel2):
+    atoms1 = get_atoms(sel1, ['chain', 'resi'])
+    atoms2 = get_atoms(sel2, ['chain', 'resi'])
+
+    resis1 = set(zip(atoms1.resi, atoms1.chain))
+    resis2 = set(zip(atoms2.resi, atoms2.chain))
+
+    labels = []
+    values = []
+    for resi, chain in resis1:
+        labels.append(f'{resi}{chain}')
+        values.append(pm.rms(
+            f"({sel1}) and resi {resi} and chain {chain}",
+            f"({sel2}) and resi {resi} and chain {chain}"
+        ))
+    ax = sb.lineplot(labels, values)
+    ax.set_title("RMS per residue")
+    ax.set_xticklabels(labels, rotation=45, ha="right")
+    plt.show()
+
