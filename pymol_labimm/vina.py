@@ -69,6 +69,8 @@ import pymol.gui
 from pymol import cmd
 from pymol.cgo import COLOR, CYLINDER, SPHERE
 
+from .commons import run
+
 QWidget = pymol.Qt.QtWidgets.QWidget
 QFileDialog = pymol.Qt.QtWidgets.QFileDialog
 QFormLayout = pymol.Qt.QtWidgets.QFormLayout
@@ -106,15 +108,6 @@ QIcon = pymol.Qt.QtGui.QIcon
 ###############################################
 #                Utils                        #
 ###############################################
-
-
-def run(command):
-    ret = subprocess.run(
-        shlex.split(command), stdout=subprocess.PIPE, stderr=subprocess.STDOUT
-    )
-    output = ret.stdout.decode()
-    success = ret.returncode == 0
-    return output, success
 
 
 @contextmanager
@@ -784,7 +777,7 @@ class VinaThread(BaseThread):
 
         vina = pymol.plugins.pref_get("LABIMM_VINA")
         base_command = (
-            f"{vina}"
+            f'"{vina}"'
             f" --center_x {center_x}"
             f" --center_y {center_y}"
             f" --center_z {center_z}"
