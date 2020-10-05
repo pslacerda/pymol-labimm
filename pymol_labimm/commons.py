@@ -1,6 +1,8 @@
 import hashlib
 import random
 from contextlib import contextmanager
+import subprocess
+import shlex
 
 import numpy as np
 import pandas as pd
@@ -107,6 +109,14 @@ def count_molecules(selection="all"):
     pm.delete(tmpsele)
     return count
 
+
+def run(command):
+    ret = subprocess.run(
+        shlex.split(command), stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+    )
+    output = ret.stdout.decode()
+    success = ret.returncode == 0
+    return output, success
 
 #
 # Commands
