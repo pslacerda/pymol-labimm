@@ -28,14 +28,12 @@ setup(
         "Programming Language :: Python :: 3.7",
     ],
     packages=find_packages(),
-    # TODO remove unused requirements
     install_requires=[
         "lxml",
         "pandas",
         "scipy",
         "requests",
         "cached_property",
-        "patool",
         "matplotlib",
         "seaborn",
         "jinja2",
