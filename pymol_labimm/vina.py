@@ -62,12 +62,16 @@ from contextlib import contextmanager
 from glob import glob
 from operator import itemgetter
 from os.path import basename, dirname, expanduser, splitext
+import tempfile
 
 import numpy as np
 import pymol
 import pymol.gui
 from pymol import cmd
 from pymol.cgo import COLOR, CYLINDER, SPHERE
+from plip.visualization.pymol import PyMOLVisualizer
+from plip.basic.remote import VisualizerData
+from plip.structure.preparation import PDBComplex
 
 from .commons import run
 
@@ -278,15 +282,17 @@ def load_vina_results(project_file, group, max_load, max_rank, interactions_chec
         cache_name = cmd.get_legal_name(pose["filename"].replace(".", "_"))
         if cache_name not in cache:
             cmd.load(pose["filename"], cache_name)
+            cmd.alter(cache_name, "chain='Z'")
+            cmd.alter(cache_name, "type='HETATM'")
+            cmd.alter(cache_name, "resi=1")
+            cmd.rename(cache_name, 'LIG')
             cache.add(cache_name)
 
         # Compute object names
         score = int(-10 * pose["affinity"])
         state = pose["mode"]
         base_name = f'{group}.{pose["name"]}_{pose["mode"]}_{score}'
-        obj_name = f"{base_name}.mol"
-        polar_name = f"{base_name}.polar"
-
+        obj_name = f"{base_name}"
         # Create group
         cmd.group(base_name)
 
@@ -295,8 +301,14 @@ def load_vina_results(project_file, group, max_load, max_rank, interactions_chec
         cmd.group(base_name, obj_name)
 
         if interactions_check:
-            cmd.distance(polar_name, target_name, obj_name, 2)
-            cmd.group(base_name, polar_name)
+            _, tmp_file = tempfile.mkstemp(suffix='.pdb')
+            cmd.save(tmp_file, f'{target_name} or {obj_name}')
+
+            breakpoint()
+            pdb_complex = PDBComplex()
+            pdb_complex.load_pdb(tmp_file)
+            pdb_complex.analyze()
+            visualizer = PyMOLVisualizer(VisualizerData(pdb_complex, 'LIG:Z:1'))
 
         objects.add(obj_name)
         count += 1

@@ -1,6 +1,9 @@
 import subprocess
 import sys
-
+try:
+    import conda.cli.python_api as conda
+except:
+    pass
 
 def pip(args):
     process = subprocess.Popen(
@@ -10,17 +13,26 @@ def pip(args):
         stderr=subprocess.PIPE,
     )
     out, err = process.communicate()
-    return process, out, err
+    return out, err, process.returncode
 
 
 try:
     from pymol_labimm import init_plugin
 except:
-    proc, out, err = pip(["install", "--upgrade", "pymol-labimm"])
+    try:
+        out, err, rv = conda.run_command("install", "-c", "conda-forge", "-y", "-q", "openbabel", "plip")
+        if out:
+            print(out)
+        if err:
+            print(err)
+    except:
+        pass
+    out, err, rv = pip(["install", "--upgrade", "pymol-labimm"])
     if out:
         print(out)
     if err:
         print(err)
+
     from pymol_labimm import init_plugin
 
 
