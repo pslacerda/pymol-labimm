@@ -2,7 +2,9 @@ import subprocess
 import sys
 
 import pymol.gui
+from pymol.plugins import pref_get
 
+from .commons import rscript
 from .fetch_similar.blast_gui import init_gui as fetch_similar_blast_init_gui
 from .fetch_similar.shape3d_gui import \
     init_gui as fetch_similar_shape3d_init_gui
@@ -47,3 +49,9 @@ def init_plugin():
             print(out)
         if err:
             print(err)
+
+        if pref_get("LABIMM_RSCRIPT"):
+            out, success = rscript("library(bio3d)")
+            if "there is no packaged called" in out:
+                out, success = rscript("install.packages('bio3d')")
+                print(out)

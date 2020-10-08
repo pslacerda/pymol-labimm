@@ -1,19 +1,20 @@
-import json
+import webbrowser
 from ftplib import FTP
 from functools import lru_cache
 
 import requests
 from pymol import cmd as pm
 
+from ..commons import rscript
 from ..prefs import PLUGIN_DATA_DIR
 
 
 @pm.extend
 def fetch_similar_blast_update():
     """
-The cluster database needs to be updated before the first use of the
-fetch_similar_blast feature. The database ftp://resources.rcsb.org/sequence/clusters/
-is updated weekly, for new data is prudent to run this command weekly.
+    The cluster database needs to be updated before the first use of the
+    fetch_similar_blast feature. The database ftp://resources.rcsb.org/sequence/clusters/
+    is updated weekly, for new data is prudent to run this command weekly.
     """
     rscb_server = FTP("resources.rcsb.org")
     rscb_server.login()
@@ -79,6 +80,26 @@ def get_resolution(pdb_id):
     return resol
 
 
+def plot_hierarquical_cluster(chain_ids):
+    chain_ids = ",".join(map(repr, chain_ids))
+    out, success = rscript(
+        f"""
+        library(bio3d)
+        ids <- c({chain_ids})
+        files <- get.pdb(ids, path="pdbs", split=TRUE)
+        pdbs <- pdbaln(files)
+        cores <- core.find(pdbs)
+        xyz <- pdbfit(pdbs, inds=cores)
+        pc <- pca(xyz, rm.gaps=TRUE)
+        d <- dist(pc$z[, 1:2])
+        hc <- hclust(d)
+        hclustplot(hc, k=1, labels = ids)
+    """
+    )
+    webbrowser.open("Rplots.pdf")
+    print(out)
+
+
 @pm.extend
 def fetch_similar_blast(
     chain_id,
@@ -91,33 +112,33 @@ def fetch_similar_blast(
     max_structures=50,
 ):
     """
-Fetch sequence similar structures from RCSB PDB and optionally keep only
-apo structures. Apo are evaluated respective to a choosen ligand on the
-reference chain.
+    Fetch sequence similar structures from RCSB PDB and optionally keep only
+    apo structures. Apo are evaluated respective to a choosen ligand on the
+    reference chain.
 
-On the first use update the database with the command `update_cluster_data`.
-Update the database weekly.
+    On the first use update the database with the command `update_cluster_data`.
+    Update the database weekly.
 
-OPTIONS
-    chain_id        Reference structure chain id.
-    similarity      Sequence similarity threshold (one of the available
-                    from RCSB PDB).
-    ligand          Reference ligand PDB id.
-    dist            Distance cut-off around reference ligand for apo
-                    evaluation.
-    compounds       Selection that should be considered ligands upon apo
-                    computation. Only used when ligand is given.
-    prothestic_groups   List of ligands to be ignored when evaluating apo.
-    max_resolution  Fetch only X-ray structures with up to such
-                    resolution.
-    max_structures  Fetch at most n structures. 0 for all structures.
-EXAMPLES
-    fetch_similar_blast 2XY9_A, 100
-    fetch_similar_blast 2XY9_A, 95, 3ES, 3, organic
-    fetch_similar_blast 6Y2F_A, max_structures=0
-SEE ALSO
-    update_cluster_data
-    fetch_similar_shape3d
+    OPTIONS
+        chain_id        Reference structure chain id.
+        similarity      Sequence similarity threshold (one of the available
+                        from RCSB PDB).
+        ligand          Reference ligand PDB id.
+        dist            Distance cut-off around reference ligand for apo
+                        evaluation.
+        compounds       Selection that should be considered ligands upon apo
+                        computation. Only used when ligand is given.
+        prothestic_groups   List of ligands to be ignored when evaluating apo.
+        max_resolution  Fetch only X-ray structures with up to such
+                        resolution.
+        max_structures  Fetch at most n structures. 0 for all structures.
+    EXAMPLES
+        fetch_similar_blast 2XY9_A, 100
+        fetch_similar_blast 2XY9_A, 95, 3ES, 3, organic
+        fetch_similar_blast 6Y2F_A, max_structures=0
+    SEE ALSO
+        update_cluster_data
+        fetch_similar_shape3d
     """
     chain_id = chain_id.upper()
     max_structures = int(max_structures)
@@ -167,4 +188,6 @@ SEE ALSO
 
         cont += 1
         sims.append((sim_obj, sim_chain, sim_pdb, resol))
+
+    plot_hierarquical_cluster([chain_id] + [s[0] for s in sims])
     return sims

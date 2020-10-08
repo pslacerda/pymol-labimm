@@ -1,16 +1,18 @@
 import hashlib
 import random
-from contextlib import contextmanager
-import subprocess
 import shlex
+import subprocess
+import tempfile
+from contextlib import contextmanager
 
 import numpy as np
 import pandas as pd
 import scipy.spatial
-from pymol import cmd as pm
-from pymol import stored
 import seaborn as sb
 from matplotlib import pyplot as plt
+from pymol import cmd as pm
+from pymol import stored
+from pymol.plugins import pref_get
 
 #
 # Generic
@@ -110,13 +112,26 @@ def count_molecules(selection="all"):
     return count
 
 
+#
+# Etcetera
+#
+
+
 def run(command):
-    ret = subprocess.run(
-        shlex.split(command), stdout=subprocess.PIPE, stderr=subprocess.STDOUT
-    )
+    if isinstance(command, str):
+        command = shlex.split(command)
+    ret = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     output = ret.stdout.decode()
     success = ret.returncode == 0
     return output, success
+
+
+def rscript(script):
+    tmp_fd, tmp_path = tempfile.mkstemp(".R")
+    with open(tmp_fd, "w") as tmp_file:
+        tmp_file.write(script)
+    return run([pref_get("LABIMM_RSCRIPT"), tmp_path])
+
 
 #
 # Commands
@@ -228,8 +243,8 @@ def nearby_aminoacids_similarity(
 
 @pm.extend
 def rms_per_residue(sel1, sel2):
-    atoms1 = get_atoms(sel1, ['chain', 'resi'])
-    atoms2 = get_atoms(sel2, ['chain', 'resi'])
+    atoms1 = get_atoms(sel1, ["chain", "resi"])
+    atoms2 = get_atoms(sel2, ["chain", "resi"])
 
     resis1 = set(zip(atoms1.resi, atoms1.chain))
     resis2 = set(zip(atoms2.resi, atoms2.chain))
@@ -237,13 +252,14 @@ def rms_per_residue(sel1, sel2):
     labels = []
     values = []
     for resi, chain in resis1:
-        labels.append(f'{resi}{chain}')
-        values.append(pm.rms(
-            f"({sel1}) and resi {resi} and chain {chain}",
-            f"({sel2}) and resi {resi} and chain {chain}"
-        ))
+        labels.append(f"{resi}{chain}")
+        values.append(
+            pm.rms(
+                f"({sel1}) and resi {resi} and chain {chain}",
+                f"({sel2}) and resi {resi} and chain {chain}",
+            )
+        )
     ax = sb.lineplot(labels, values)
     ax.set_title("RMS per residue")
     ax.set_xticklabels(labels, rotation=45, ha="right")
     plt.show()
-

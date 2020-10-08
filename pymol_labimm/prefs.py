@@ -10,6 +10,7 @@ if platform.platform() == "MacOS":
         "LABIMM_ADT_PYTHON": "",
         "LABIMM_PREPARE_RECEPTOR": "",
         "LABIMM_PREPARE_FLEXRECEPTOR": "",
+        "LABIMM_RSCRIPT": "",
     }
 
 elif platform.platform() == "Windows":
@@ -19,6 +20,7 @@ elif platform.platform() == "Windows":
         "LABIMM_ADT_PYTHON": "",
         "LABIMM_PREPARE_RECEPTOR": "",
         "LABIMM_PREPARE_FLEXRECEPTOR": "",
+        "LABIMM_RSCRIPT": "",
     }
 
 else:  # platform == 'Linux'
@@ -28,6 +30,7 @@ else:  # platform == 'Linux'
         "LABIMM_ADT_PYTHON": "/usr/bin/python2.7",
         "LABIMM_PREPARE_RECEPTOR": "/usr/lib/python2.7/dist-packages/AutoDockTools/Utilities24/prepare_receptor4.py",
         "LABIMM_PREPARE_FLEXRECEPTOR": "/usr/lib/python2.7/dist-packages/AutoDockTools/Utilities24/prepare_flexreceptor4.py",
+        "LABIMM_RSCRIPT": "/usr/bin/Rscript",
     }
 
 
