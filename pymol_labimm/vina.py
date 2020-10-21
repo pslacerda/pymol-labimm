@@ -507,6 +507,7 @@ class VinaThread(BaseThread):
         #
         # Check if the output
         #
+
         if os.listdir(results_dir):
             self.logEvent.emit(
                 f"""
@@ -521,12 +522,12 @@ class VinaThread(BaseThread):
         # Create ligand directory
         #
 
-        ligands_dir = results_dir + "/ligands"
+        ligands_dir = "ligands"
         try:
-            os.mkdir(ligands_dir)
+            os.mkdir(results_dir + "/" + ligands_dir)
         except FileExistsError:
-            shutil.rmtree(ligands_dir)
-            os.mkdir(ligands_dir)
+            shutil.rmtree(results_dir + "/" + ligands_dir)
+            os.mkdir(results_dir + "/" + ligands_dir)
 
         #
         # Convert SMILES file into PDBQT
@@ -537,7 +538,7 @@ class VinaThread(BaseThread):
             f" -ph {ph} --gen3d -m"
             f' -O "{ligands_dir}/.pdbqt"'
         )
-        output, success = run(command)
+        output, success = run(command, cwd=results_dir)
         if success:
             self.logEvent.emit(
                 f"""
@@ -621,14 +622,14 @@ class VinaThread(BaseThread):
         # Prepare rigid target
         #
 
-        target_pdb = f"{results_dir}/target.pdb"
+        target_pdb = "target.pdb"
         cmd.save(target_pdb, target_sel)
 
         with chdir(dirname(target_pdb)):
             adt_python = pymol.plugins.pref_get("LABIMM_ADT_PYTHON")
             prepare_target = pymol.plugins.pref_get("LABIMM_PREPARE_RECEPTOR")
             command = f'"{adt_python}"' f' "{prepare_target}" -r "{target_pdb}"'
-            output, success = run(command)
+            output, success = run(command, cwd=results_dir)
             if success:
                 self.logEvent.emit(
                     f"""
@@ -667,7 +668,7 @@ class VinaThread(BaseThread):
             # Run AutoDock command
             #
 
-            target_pdbqt = f"{results_dir}/target.pdbqt"
+            target_pdbqt = "target.pdbqt"
             with chdir(dirname(target_pdb)):
                 adt_python = pymol.plugins.pref_get("LABIMM_ADT_PYTHON")
                 prepare_flexreceptor = pymol.plugins.pref_get(
@@ -679,7 +680,7 @@ class VinaThread(BaseThread):
                     f' -r "{target_pdbqt}"'
                     f" -s {flex_residues}"
                 )
-                output, success = run(command)
+                output, success = run(command, cwd=results_dir)
                 if success:
                     self.logEvent.emit(
                         f"""
@@ -705,9 +706,9 @@ class VinaThread(BaseThread):
         # Create Vina results directory
         #
 
-        output_dir = f"{results_dir}/poses"
+        output_dir = "poses"
         try:
-            os.mkdir(output_dir)
+            os.mkdir(results_dir + "/" + output_dir)
         except FileExistsError:
             pass
 
@@ -741,7 +742,7 @@ class VinaThread(BaseThread):
         # Project data
         #
 
-        project_file = results_dir + "/docking.json"
+        project_file = "docking.json"
         project_data = {}
 
         project_data.update(
@@ -790,6 +791,13 @@ class VinaThread(BaseThread):
             f" --num_modes {num_modes}"
             f" --energy_range {energy_range}"
         )
+        if project_data["flexible"]:
+            rigid_pdbqt = project_data["rigid_pdbqt"]
+            flex_pdbqt = project_data["flex_pdbqt"]
+            base_command += f' --receptor "{rigid_pdbqt}"' f' --flex "{flex_pdbqt}"'
+        else:
+            target_pdbqt = project_data["target_pdbqt"]
+            base_command += f' --receptor "{target_pdbqt}"'
         self.logEvent.emit(
             f"""
             <br/>
@@ -810,15 +818,8 @@ class VinaThread(BaseThread):
                 f' --out "{output_pdbqt}"'
                 f' --log "{log_txt}"'
             )
-            if project_data["flexible"]:
-                rigid_pdbqt = project_data["rigid_pdbqt"]
-                flex_pdbqt = project_data["flex_pdbqt"]
-                command += f' --receptor "{rigid_pdbqt}"' f' --flex "{flex_pdbqt}"'
-            else:
-                target_pdbqt = project_data["target_pdbqt"]
-                command += f' --receptor "{target_pdbqt}"'
 
-            output, success = run(command)
+            output, success = run(command, cwd=results_dir)
             self.currentStep.emit(i + 1)
             if not success:
                 fail_count += 1

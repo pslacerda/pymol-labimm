@@ -93,7 +93,9 @@ def parse_binding_moad(moad_csv_file):
                         )
 
                         entries.append(
-                            {**entry,}
+                            {
+                                **entry,
+                            }
                         )
 
     # Structures with no valid ligand must be removed

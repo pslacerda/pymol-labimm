@@ -565,14 +565,14 @@ def process_session(
 @pm.extend
 def calculate_kozakov2015(*args, **kwargs):
     """
-Calculate a hotspot following Kozakov et al (2015).
+    Calculate a hotspot following Kozakov et al (2015).
 
-USAGE
-    calculate_kozakov2015 sel1, ...
+    USAGE
+        calculate_kozakov2015 sel1, ...
 
-EXAMPLES
-    calculate_kozakov2015 *CS.000_*, *CS.002_*
-    calculate_kozakov2015 *.000_*, *.001_*
+    EXAMPLES
+        calculate_kozakov2015 *CS.000_*, *CS.002_*
+        calculate_kozakov2015 *.000_*, *.001_*
 
     """
     clusters = []

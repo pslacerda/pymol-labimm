@@ -25,24 +25,24 @@ def fetch_similar_shape3d(
     prosthetic_groups: str = "HEM FAD NAP NDP ADP FMN",
 ) -> [SimilarStructure]:
     """
-Fetch similar structures using the 3D-Shape algorithm.
+    Fetch similar structures using the 3D-Shape algorithm.
 
-https://search.rcsb.org/
+    https://search.rcsb.org/
 
-OPTIONS:
-    pdb_id          Reference PDB id.
-    min_similarity  3D-Shape score threshold.
-    max_resolution  Fetch only structures up to such resolution.
-    ligand          Refrence ligand PDB id for apo evaluation.
-    dist            Distance cut-off around reference ligand for apo
-                    evaluation. Only used when ligand is given.
-    compounds       Selection that shold be considered ligands upon apo
-                    evaluation. Only used when ligand is given.
-    prosthetic_groups   List of ligands to be ignored when evaluating apo.
-EXAMPLES:
-    fetch_similar_shape3d 2XY9
-SEE ALSO:
-    fetch_similar_blast
+    OPTIONS:
+        pdb_id          Reference PDB id.
+        min_similarity  3D-Shape score threshold.
+        max_resolution  Fetch only structures up to such resolution.
+        ligand          Refrence ligand PDB id for apo evaluation.
+        dist            Distance cut-off around reference ligand for apo
+                        evaluation. Only used when ligand is given.
+        compounds       Selection that shold be considered ligands upon apo
+                        evaluation. Only used when ligand is given.
+        prosthetic_groups   List of ligands to be ignored when evaluating apo.
+    EXAMPLES:
+        fetch_similar_shape3d 2XY9
+    SEE ALSO:
+        fetch_similar_blast
     """
     ret = requests.post(
         url="https://search.rcsb.org/rcsbsearch/v1/query",
@@ -64,7 +64,9 @@ SEE ALSO:
     similars = []
     for i, result in enumerate(ret.json()["result_set"]):
         sim = SimilarStructure(
-            pdb_id=result["identifier"], score=result["score"], resolution=None,
+            pdb_id=result["identifier"],
+            score=result["score"],
+            resolution=None,
         )
 
         # Chek the similarity threshold
