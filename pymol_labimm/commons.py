@@ -117,10 +117,10 @@ def count_molecules(selection="all"):
 #
 
 
-def run(command):
+def run(command, **kwargs):
     if isinstance(command, str):
         command = shlex.split(command)
-    ret = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    ret = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kwargs)
     output = ret.stdout.decode()
     success = ret.returncode == 0
     return output, success
