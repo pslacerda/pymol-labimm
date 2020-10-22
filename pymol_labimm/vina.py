@@ -597,7 +597,8 @@ class VinaThread(BaseThread):
                         has_names = False
                         continue
                     shutil.move(
-                        f"{ligands_dir}/{count}.pdbqt", f"{ligands_dir}/{name}.pdbqt"
+                        f"{results_dir}/{ligands_dir}/{count}.pdbqt",
+                        f"{results_dir}/{ligands_dir}/{name}.pdbqt"
                     )
 
         if len(glob(f"{ligands_dir}/*.pdbqt")) != count:
