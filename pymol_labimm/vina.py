@@ -806,6 +806,18 @@ class VinaThread(BaseThread):
             <b>Vina base command:</b> {base_command}
         """
         )
+        with open(results_dir + '/run_vina_screening.sh') as script_file:
+            script_file.write(
+                f"""#!/bin/bash
+                for ligand_pdbqt in $(find ligands -name '*.pdbqt')
+                do
+                    name=$(basename ${{ligand_pdbqt%.pdbqt}})
+                    {base_command} \
+                        --ligand $ligand_pdbqt \
+                        --out poses/$name.out.pdbqt \
+                        --log poses/$name.log
+                done
+            """)
 
         fail_count = 0
         for i, ligand_pdbqt in enumerate(glob(f"{ligands_dir}/*.pdbqt")):
