@@ -508,7 +508,10 @@ class VinaThread(BaseThread):
         # Check if the output
         #
 
-        if os.listdir(results_dir):
+        def proj(path):
+            return results_dir + '/' + path
+
+        if os.listdir(proj('/')):
             self.logEvent.emit(
                 f"""
                 <br/>
@@ -522,12 +525,12 @@ class VinaThread(BaseThread):
         # Create ligand directory
         #
 
-        ligands_dir = "ligands"
+        ligands_dir = proj("ligands")
         try:
-            os.mkdir(results_dir + "/" + ligands_dir)
+            os.mkdir(ligands_dir)
         except FileExistsError:
-            shutil.rmtree(results_dir + "/" + ligands_dir)
-            os.mkdir(results_dir + "/" + ligands_dir)
+            shutil.rmtree(ligands_dir)
+            os.mkdir(ligands_dir)
 
         #
         # Convert SMILES file into PDBQT
@@ -597,8 +600,8 @@ class VinaThread(BaseThread):
                         has_names = False
                         continue
                     shutil.move(
-                        f"{results_dir}/{ligands_dir}/{count}.pdbqt",
-                        f"{results_dir}/{ligands_dir}/{name}.pdbqt"
+                        f"{ligands_dir}/{count}.pdbqt",
+                        f"{ligands_dir}/{name}.pdbqt"
                     )
 
         if len(glob(f"{ligands_dir}/*.pdbqt")) != count:
@@ -622,35 +625,33 @@ class VinaThread(BaseThread):
         #
         # Prepare rigid target
         #
-
-        target_pdb = "target.pdb"
+        target_pdb = proj("target.pdb")
         cmd.save(target_pdb, target_sel)
 
-        with chdir(dirname(target_pdb)):
-            adt_python = pymol.plugins.pref_get("LABIMM_ADT_PYTHON")
-            prepare_target = pymol.plugins.pref_get("LABIMM_PREPARE_RECEPTOR")
-            command = f'"{adt_python}"' f' "{prepare_target}" -r "{target_pdb}"'
-            output, success = run(command, cwd=results_dir)
-            if success:
-                self.logEvent.emit(
-                    f"""
-                    <br/>
-                    <br/><b>Rigid target prepared.</b>
-                    <br/><b>AutoDock command:</b> {command}
-                """
-                )
-                self.logCodeEvent.emit(output)
-            else:
-                self.logEvent.emit(
-                    f"""
-                    <br/>
-                    <br/><b>Rigid target preparation failed.</b>
-                    <br/><b>AutoDock command:</b> {command}
-                """
-                )
-                self.logCodeEvent.emit(output)
-                self.done.emit(False)
-                return
+        adt_python = pymol.plugins.pref_get("LABIMM_ADT_PYTHON")
+        prepare_target = pymol.plugins.pref_get("LABIMM_PREPARE_RECEPTOR")
+        command = f'"{adt_python}"' f' "{prepare_target}" -r "{target_pdb}"'
+        output, success = run(command, cwd=dirname(target_pdb))
+        if success:
+            self.logEvent.emit(
+                f"""
+                <br/>
+                <br/><b>Rigid target prepared.</b>
+                <br/><b>AutoDock command:</b> {command}
+            """
+            )
+            self.logCodeEvent.emit(output)
+        else:
+            self.logEvent.emit(
+                f"""
+                <br/>
+                <br/><b>Rigid target preparation failed.</b>
+                <br/><b>AutoDock command:</b> {command}
+            """
+            )
+            self.logCodeEvent.emit(output)
+            self.done.emit(False)
+            return
 
         #
         # Prepare flexible target
@@ -669,47 +670,46 @@ class VinaThread(BaseThread):
             # Run AutoDock command
             #
 
-            target_pdbqt = "target.pdbqt"
-            with chdir(dirname(target_pdb)):
-                adt_python = pymol.plugins.pref_get("LABIMM_ADT_PYTHON")
-                prepare_flexreceptor = pymol.plugins.pref_get(
-                    "LABIMM_PREPARE_FLEXRECEPTOR"
+            target_pdbqt = proj("target.pdbqt")
+            adt_python = pymol.plugins.pref_get("LABIMM_ADT_PYTHON")
+            prepare_flexreceptor = pymol.plugins.pref_get(
+                "LABIMM_PREPARE_FLEXRECEPTOR"
+            )
+            command = (
+                f'"{adt_python}"'
+                f'"{prepare_flexreceptor}"'
+                f' -r "{target_pdbqt}"'
+                f" -s {flex_residues}"
+            )
+            output, success = run(command, cwd=dirname(target_pdb))
+            if success:
+                self.logEvent.emit(
+                    f"""
+                    <br/>
+                    <br/><b>Flexible target prepared.</b>
+                    <br/><b>AutoDock command:</b> {command}
+                """
                 )
-                command = (
-                    f'"{adt_python}"'
-                    f'"{prepare_flexreceptor}"'
-                    f' -r "{target_pdbqt}"'
-                    f" -s {flex_residues}"
+                self.logCodeEvent.emit(output)
+            else:
+                self.logEvent.emit(
+                    f"""
+                    <br/>
+                    <br/><b>Flexible target preparation failed.</b>
+                    <br/><b>AutoDock command:</b> {command}
+                """
                 )
-                output, success = run(command, cwd=results_dir)
-                if success:
-                    self.logEvent.emit(
-                        f"""
-                        <br/>
-                        <br/><b>Flexible target prepared.</b>
-                        <br/><b>AutoDock command:</b> {command}
-                    """
-                    )
-                    self.logCodeEvent.emit(output)
-                else:
-                    self.logEvent.emit(
-                        f"""
-                        <br/>
-                        <br/><b>Flexible target preparation failed.</b>
-                        <br/><b>AutoDock command:</b> {command}
-                    """
-                    )
-                    self.logCodeEvent.emit(output)
-                    self.done.emit(False)
-                    return
+                self.logCodeEvent.emit(output)
+                self.done.emit(False)
+                return
 
         #
         # Create Vina results directory
         #
 
-        output_dir = "poses"
+        output_dir = proj("poses")
         try:
-            os.mkdir(results_dir + "/" + output_dir)
+            os.mkdir(output_dir)
         except FileExistsError:
             pass
 
@@ -743,7 +743,7 @@ class VinaThread(BaseThread):
         # Project data
         #
 
-        project_file = "docking.json"
+        project_file = proj("docking.json")
         project_data = {}
 
         project_data.update(
@@ -807,13 +807,15 @@ class VinaThread(BaseThread):
             <b>Vina base command:</b> {base_command}
         """
         )
-        with open(results_dir + '/run_vina_screening.sh') as script_file:
+
+        script_command = base_command.replace(results_dir, "./")
+        with open(results_dir + '/run_vina_screening.sh', 'w') as script_file:
             script_file.write(
                 f"""#!/bin/bash
                 for ligand_pdbqt in $(find ligands -name '*.pdbqt')
                 do
                     name=$(basename ${{ligand_pdbqt%.pdbqt}})
-                    {base_command} \
+                    {script_command} \
                         --ligand $ligand_pdbqt \
                         --out poses/$name.out.pdbqt \
                         --log poses/$name.log

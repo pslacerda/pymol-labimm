@@ -37,7 +37,8 @@ else:  # platform == 'Linux'
 def guess_prefs():
     for pref in PREFS_GUESSES:
         if not pymol.plugins.pref_get(pref):
-            pymol.plugins.pref_set(pref, PREFS_GUESSES[pref])
+            if os.path.exists(PREFS_GUESSES[pref]):
+                pymol.plugins.pref_set(pref, PREFS_GUESSES[pref])
 
 
 PLUGIN_DATA_DIR = os.path.expanduser("~/.pymol/labimm")
