@@ -630,7 +630,7 @@ class VinaThread(BaseThread):
 
         adt_python = pymol.plugins.pref_get("LABIMM_ADT_PYTHON")
         prepare_target = pymol.plugins.pref_get("LABIMM_PREPARE_RECEPTOR")
-        command = f'"{adt_python}"' f' "{prepare_target}" --receptor "{target_pdb}"'
+        command = f'"{adt_python}"' f' "{prepare_target}" -r "{target_pdb}"'
         output, success = run(command, cwd=dirname(target_pdb))
         if success:
             self.logEvent.emit(
