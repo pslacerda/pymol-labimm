@@ -10,7 +10,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="pymol-labimm",
-    version="0.13.6",
+    version="0.13.7",
     description="Some PyMOL utilities",
     long_description=README,
     long_description_content_type="text/markdown",
