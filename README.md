@@ -1,1 +1,1 @@
-Install the plugin https://github.com/pslacerda/pymol-labimm/blob/master/scripts/pymol_labimm.py.
+New version https://tiny.cc/XDrugPy
